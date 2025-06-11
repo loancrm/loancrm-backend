@@ -29,11 +29,43 @@ function fetchAllowedIPs() {
 //     }
 // }
 
+// async function ipWhitelist(req, res, next) {
+//     try {
+//         allowedIPs = await fetchAllowedIPs();
+//         if (allowedIPs.includes("0.0.0.0")) {
+//             return next();
+//         }
+//         // console.log(req.headers["mysystem-ip"])
+//         const clientIPPrefix = req.headers["mysystem-ip"].split(".").slice(0, 2).join(".");
+//         const isAllowed = allowedIPs.includes(clientIPPrefix);
+//         if (isAllowed) {
+//             next();
+//         } else {
+//             if (isUserLoggedIn(req)) {
+//                 return userLogoutforIp(req, res);
+//             } else {
+//                 res.status(403).send("Access denied. IP not allowed");
+//             }
+//         }
+//     } catch (error) {
+//         console.error("Error handling IP whitelist:", error);
+//         res.status(500).send("Internal server error");
+//     }
+// }
+
 async function ipWhitelist(req, res, next) {
     try {
-        allowedIPs = await fetchAllowedIPs();
-        // console.log(req.headers["mysystem-ip"])
-        const clientIPPrefix = req.headers["mysystem-ip"].split(".").slice(0, 2).join(".");
+        const allowedIPs = await fetchAllowedIPs(); // should return an array like ["123.45", "127.0", "0.0.0.0"]
+        // console.log(allowedIPs)
+        // If '0.0.0.0' is present, skip IP restriction
+        if (allowedIPs.includes("0.0")) {
+            return next();
+        }
+        const clientIPHeader = req.headers["mysystem-ip"];
+        if (!clientIPHeader) {
+            return res.status(400).send("Client IP missing from headers.");
+        }
+        const clientIPPrefix = clientIPHeader.split(".").slice(0, 2).join(".");
         const isAllowed = allowedIPs.includes(clientIPPrefix);
         if (isAllowed) {
             next();

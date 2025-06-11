@@ -215,7 +215,7 @@ const getFilesCount = asyncHandler(async (req, res) => {
     }
 
     const leadIds = leadResult.map(l => l.id);
-    if (leadIds.length === 0) return res.status(200).send({ count: 0 });
+    if (leadIds.length === 0) return res.status(200).send("0");
 
     // Build WHERE clause for leadId IN (...)
     const idsInClause = `leadId IN (${leadIds.map(id => dbConnect.escape(id)).join(",")})`;

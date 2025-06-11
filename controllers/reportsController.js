@@ -246,6 +246,7 @@ const exportFilesInProcess = asyncHandler(async (req, res) => {
             for (let i = 0; i < result.length; i++) {
                 result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -334,6 +335,7 @@ const exportApprovalLeads = asyncHandler(async (req, res) => {
             for (let i = 0; i < result.length; i++) {
                 result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -513,6 +515,7 @@ const exportBankRejectedLeads = asyncHandler(async (req, res) => {
             for (let i = 0; i < result.length; i++) {
                 result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {

@@ -16,15 +16,14 @@ const createUsers = asyncHandler(async (req, res) => {
   req.body["userInternalStatus"] = 1;
   req.body["lastUserInternalStatus"] = 1;
   req.body["password"] = encryptedPassword;
-  const checkIfExistsQuery = `SELECT * FROM users WHERE name = ?`;
-  dbConnect.query(checkIfExistsQuery, [req.body.name], (err, results) => {
+  const checkIfExistsQuery = `SELECT * FROM users WHERE email = ? OR phone = ?`;
+  dbConnect.query(checkIfExistsQuery, [req.body.email, req.body.phone], (err, results) => {
     if (err) {
       console.error("Error checking if user exists:", err);
-      return res.status(500).send("Error in Checking Username");
+      return res.status(500).send("Error in Checking Email or Phone Number");
     }
     if (results.length > 0) {
-      res.status(400).send("User with this username already exists");
-      return;
+      return res.status(400).send("User with this email or phone number already exists");
     }
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO users (${createClause[0]}) VALUES (${createClause[1]})`;
