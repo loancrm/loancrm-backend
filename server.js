@@ -41,12 +41,12 @@ app.use("/uploads", applyIpWhitelist, authMiddleware, express.static(path.join(_
 
 scheduleCronJobs();
 // console.log(process.env.PORT)
-app.listen(process.env.PORT, () => {
-  console.log("Server Running Peacefully");
-});
-// https.createServer(options, app).listen(process.env.PORT, () => {
-//   console.log(`HTTPS Server running on port ${process.env.PORT}`);
+// app.listen(process.env.PORT, () => {
+//   console.log("Server Running Peacefully");
 // });
+https.createServer(options, app).listen(process.env.PORT, () => {
+  console.log(`HTTPS Server running on port ${process.env.PORT}`);
+});
 
 // const express = require("express");
 // const http = require('http');
