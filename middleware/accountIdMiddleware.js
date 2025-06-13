@@ -84,10 +84,10 @@
 const dbConnect = require("../config/dbConnection");
 
 const accountIdMiddleware = (req, res, next) => {
-    console.log("req.skipAccountIdMiddleware,==========================================", req.skipAccountIdMiddleware)
+    // console.log("req.skipAccountIdMiddleware,==========================================", req.skipAccountIdMiddleware)
     if (req.skipAccountIdMiddleware) {
-        console.log("skipped ____________________________________________________________")
-        return next(); // 👈 skip middleware entirely
+        console.log("⛔ Skipping accountIdMiddleware for this route");
+        return next(); // ✅ SKIP!
     }
     const user = req.user;
     if (!user || !user.accountId) {

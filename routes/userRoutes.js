@@ -7,7 +7,10 @@ const {
   resetPassword
 } = require("../controllers/userController");
 const router = express.Router();
-
+router.use((req, res, next) => {
+  req.skipAccountIdMiddleware = true;
+  next();
+});
 router.route("/login").post(userLogin);
 router.route("/logout").post(userLogout);
 router.route("/forgot-password").post(forgotPassword);
