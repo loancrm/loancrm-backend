@@ -16,7 +16,7 @@ const createUsers = asyncHandler(async (req, res) => {
   req.body["userInternalStatus"] = 1;
   req.body["lastUserInternalStatus"] = 1;
   req.body["password"] = encryptedPassword;
-  const checkIfExistsQuery = `SELECT * FROM users WHERE email = ? OR phone = ?`;
+  const checkIfExistsQuery = `SELECT * FROM users WHERE (email = ? OR phone = ?)`;
   dbConnect.query(checkIfExistsQuery, [req.body.email, req.body.phone], (err, results) => {
     if (err) {
       console.error("Error checking if user exists:", err);
@@ -62,14 +62,14 @@ const updateUsers = asyncHandler(async (req, res) => {
   let phoneNumber = req.body.phone.toString();
   let encryptedPassword = await bcrypt.hash(phoneNumber, 12);
   req.body["password"] = encryptedPassword;
-  const checkIfExistsQuery = `SELECT * FROM users WHERE name = ? AND id != ?`;
-  dbConnect.query(checkIfExistsQuery, [req.body.name, req.params.id], (err, results) => {
+  const checkIfExistsQuery = `SELECT * FROM users WHERE (email = ? OR phone = ?) AND id != ?`;
+  dbConnect.query(checkIfExistsQuery, [req.body.email, req.body.phone, req.params.id], (err, results) => {
     if (err) {
       console.error("Error checking if user exists:", err);
-      return res.status(500).send("Error in Checking Username");
+      return res.status(500).send("Error in Checking Eamil Or Phone Number");
     }
     if (results.length > 0) {
-      res.status(400).send("User with this username already exists");
+      res.status(400).send("User with this Email or Phone Number already exists");
       return;
     }
     const updateClause = updateClauseHandler(req.body);

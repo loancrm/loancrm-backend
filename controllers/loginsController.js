@@ -119,7 +119,8 @@ const getDistinctLeadCount = asyncHandler(async (req, res) => {
   try {
     const distinctLeadIds = await fetchDistinctLeadIds();
     if (distinctLeadIds.length === 0) {
-      return res.status(200).json({ count: 0 });
+      // return res.status(200).json({ count: 0 });
+        return res.status(200).send("0");
     }
     const inClause = distinctLeadIds.map(id => `${id}`).join(",");
     let countSql = `SELECT COUNT(*) AS count FROM leads`;
@@ -703,7 +704,8 @@ const getCNIRejectedLeadCount = asyncHandler(async (req, res) => {
   try {
     const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds();
     if (distinctLeadIds.length === 0) {
-      return res.status(200).json({ count: 0 });
+      // return res.status(200).json({ count: 0 });
+      return res.status(200).send("0");
     }
     const inClause = distinctLeadIds.map(id => `${id}`).join(",");
     let countSql = `SELECT COUNT(*) AS count FROM leads`;
