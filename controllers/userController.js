@@ -12,7 +12,9 @@ const userLogin = asyncHandler(async (req, res) => {
   // const sql = `SELECT * FROM users WHERE (email = "${username}" OR name = "${username}") AND status = "Active"`;
   const sql = `SELECT * FROM users WHERE email = "${username}" AND status = "Active"`;
   console.log(sql)
+  console.log(req.body)
   dbConnect.query(sql, async (err, result) => {
+    console.log(sql)
     if (err) {
       console.log("adminlogin error in controller");
     }
@@ -22,6 +24,7 @@ const userLogin = asyncHandler(async (req, res) => {
       (await bcrypt.compare(password, result[0].password))
     ) {
       const user = result[0];
+      console.log(user)
       delete user.token;
       const accessToken = jwt.sign(
         {
@@ -45,15 +48,18 @@ const userLogin = asyncHandler(async (req, res) => {
   });
 });
 const userLogout = asyncHandler(async (req, res) => {
-  const expiredToken = (
+  let expiredToken = (
     req.headers.authorization || req.headers.Authorization
-  ).replace("Bearer ", "");
-  const decodedToken = jwt.decode(expiredToken);
-  decodedToken.exp = Math.floor(Date.now() / 1000) - 60;
-  const invalidatedToken = jwt.sign(
-    decodedToken,
-    process.env.ACCESS_TOKEN_SECRET
   );
+  if (expiredToken) {
+    expiredToken = expiredToken.replace("Bearer ", "");
+    const decodedToken = jwt.decode(expiredToken);
+    decodedToken.exp = Math.floor(Date.now() / 1000) - 60;
+    const invalidatedToken = jwt.sign(
+      decodedToken,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+  }
   res.status(200).json({ message: "Logout successful" });
 });
 
@@ -78,29 +84,23 @@ const forgotPassword = async (req, res) => {
   if (!email) {
     return res.status(400).json({ message: 'Email is required' });
   }
-
   try {
     // ✅ Use promise wrapper for async/await
     const [user] = await dbConnect.promise().query(
       'SELECT * FROM users WHERE email = ?',
       [email]
     );
-
     if (!user || user.length === 0) {
       return res.status(404).send('User not found');
     }
-
     const foundUser = user[0];
-
     // Create reset token
     const token = jwt.sign({ id: foundUser.id }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '15m',
     });
-
     // Reset link
     // http://localhost:4200/#/user/forgot-password
-    const resetLink = ` http://localhost:4200/#/user/reset-password?token=${token}`;
-
+    const resetLink = `${process.env.FRONTEND_URL}/#/user/reset-password?token=${token}`;
     // Mail transporter
     const transporter = nodemailer.createTransport({
       service: 'gmail',

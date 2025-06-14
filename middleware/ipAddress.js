@@ -7,7 +7,7 @@ function isUserLoggedIn(req) {
 let allowedIPs = [];
 function fetchAllowedIPs() {
     return new Promise((resolve, reject) => {
-        dbConnect.query("SELECT ipAddress FROM ipaddresses", (err, results) => {
+        req.dbQuery("SELECT ipAddress FROM ipaddresses", (err, results) => {
             if (err) {
                 return reject(err);
             }

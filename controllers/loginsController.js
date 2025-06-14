@@ -34,7 +34,7 @@ const createLogin = asyncHandler((req, res) => {
       WHERE leadId = ?
       AND bankId IN (${bankIds.map(() => "?").join(", ")})
   `;
-  dbConnect.query(checkExistingQuery, [leadId, ...bankIds], (err, results) => {
+  req.dbQuery(checkExistingQuery, [leadId, ...bankIds], (err, results) => {
     if (err) {
       console.error("Error checking existing logins:", err);
       return res.status(500).send("Error checking existing data");
@@ -60,7 +60,7 @@ const createLogin = asyncHandler((req, res) => {
     });
     let completedQueries = 0;
     insertQueries.forEach(query => {
-      dbConnect.query(query, (err, result) => {
+      req.dbQuery(query, (err, result) => {
         if (err) {
           console.error("createLogin error:", err);
           res.status(500).send("Error inserting data");
@@ -77,7 +77,7 @@ const createLogin = asyncHandler((req, res) => {
 
 const getDistinctLeads = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctLeadIds();
+    const distinctLeadIds = await fetchDistinctLeadIds(req);
     if (distinctLeadIds.length === 0) {
       return res.status(200).json([]);
     }
@@ -88,7 +88,7 @@ const getDistinctLeads = asyncHandler(async (req, res) => {
     queryParams["sort"] = "createdOn";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error fetching leads:", err);
         res.status(500).send("Error In Fetching Leads");
@@ -102,10 +102,10 @@ const getDistinctLeads = asyncHandler(async (req, res) => {
     res.status(500).send("Error in Fetching Distinct Leads");
   }
 });
-async function fetchDistinctLeadIds() {
+async function fetchDistinctLeadIds(req) {
   const sql = "SELECT DISTINCT leadId FROM logins";
   return new Promise((resolve, reject) => {
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -117,7 +117,7 @@ async function fetchDistinctLeadIds() {
 }
 const getDistinctLeadCount = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctLeadIds();
+    const distinctLeadIds = await fetchDistinctLeadIds(req);
     if (distinctLeadIds.length === 0) {
       // return res.status(200).json({ count: 0 });
         return res.status(200).send("0");
@@ -128,7 +128,7 @@ const getDistinctLeadCount = asyncHandler(async (req, res) => {
     queryParams["id-or"] = inClause;
     const filtersQuery = handleGlobalFilters(queryParams, true);
     countSql += filtersQuery;
-    dbConnect.query(countSql, (err, countResult) => {
+    req.dbQuery(countSql, (err, countResult) => {
       if (err) {
         console.error("Error counting leads:", err);
         res.status(500).send("Error in Fetching the Distinct Lead Counts");
@@ -145,7 +145,7 @@ const getDistinctLeadCount = asyncHandler(async (req, res) => {
 
 const getApprovedLeadCount = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctApprovedLeadIds();
+    const distinctLeadIds = await fetchDistinctApprovedLeadIds(req);
     if (distinctLeadIds.length === 0) {
       // return res.status(200).json({ count: 0 });
       return res.status(200).send("0");
@@ -156,7 +156,7 @@ const getApprovedLeadCount = asyncHandler(async (req, res) => {
     queryParams["id-or"] = inClause;
     const filtersQuery = handleGlobalFilters(queryParams, true);
     countSql += filtersQuery;
-    dbConnect.query(countSql, (err, countResult) => {
+    req.dbQuery(countSql, (err, countResult) => {
       if (err) {
         console.error("Error counting approved leads:", err);
         res.status(500).send("Error in Fetching the Approved Lead Counts");
@@ -172,7 +172,7 @@ const getApprovedLeadCount = asyncHandler(async (req, res) => {
 });
 const getDisbursalLeadCount = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctDisbursedLeadIds();
+    const distinctLeadIds = await fetchDistinctDisbursedLeadIds(req);
     if (distinctLeadIds.length === 0) {
       // return res.status(200).json({ count: 0 });
       return res.status(200).send("0");
@@ -183,7 +183,7 @@ const getDisbursalLeadCount = asyncHandler(async (req, res) => {
     queryParams["id-or"] = inClause;
     const filtersQuery = handleGlobalFilters(queryParams, true);
     countSql += filtersQuery;
-    dbConnect.query(countSql, (err, countResult) => {
+    req.dbQuery(countSql, (err, countResult) => {
       if (err) {
         console.error("Error counting disbursal leads:", err);
         res.status(500).send("Error in Fetching the Disbursal Lead Counts");
@@ -202,7 +202,7 @@ const getDisbursalLeadCount = asyncHandler(async (req, res) => {
 //   const sql = `SELECT id, program, bankName, loginDate, fipStatus, fipRemarks FROM logins WHERE leadId = ${req
 //     .params.leadId}`;
 //   const queryParams = [req.params.leadId];
-//   dbConnect.query(sql, queryParams, (err, result) => {
+//   req.dbQuery(sql, queryParams, (err, result) => {
 //     if (err) {
 //       console.error("getLoginDetailsById error in controller:", err);
 //       return res.status(500).send("Error in Fetching Details");
@@ -219,7 +219,7 @@ const getFIPDetailsById = asyncHandler((req, res) => {
     .params.leadId;
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("getLoginDetailsById error in controller:", err);
       return res.status(500).send("Error in Fetching Details");
@@ -236,7 +236,7 @@ const getApprovalsDetailsById = asyncHandler((req, res) => {
     WHERE leadId = ? AND fipStatus = 'approved'
   `;
   const queryParams = [leadId];
-  dbConnect.query(sql, queryParams, (err, result) => {
+  req.dbQuery(sql, queryParams, (err, result) => {
     if (err) {
       console.error("getApprovalsDetailsById error in controller:", err);
       return res.status(500).send("Error in Fetching Approval Details");
@@ -258,7 +258,7 @@ const getDisbursalsDetailsById = asyncHandler((req, res) => {
     WHERE leadId = ? AND approvedStatus = 'disbursed' AND fipStatus='approved'
   `;
   const queryParams = [leadId];
-  dbConnect.query(sql, queryParams, (err, result) => {
+  req.dbQuery(sql, queryParams, (err, result) => {
     if (err) {
       console.error("getDisbursalsDetailsById error in controller:", err);
       return res.status(500).send("Error in Fetching Disbursal Details");
@@ -302,7 +302,7 @@ const updateFIPDetails = asyncHandler((req, res) => {
   sql += ` WHERE id IN (${updates.map(update => "?").join(", ")})`;
   params.push(...updates.map(update => update.id));
 
-  dbConnect.query(sql, params, (err, result) => {
+  req.dbQuery(sql, params, (err, result) => {
     if (err) {
       console.error("updateApprovalsDetails error in query:", err);
       return res.status(500).send("Error in updating File in Process details");
@@ -317,7 +317,7 @@ const updateFIPDetails = asyncHandler((req, res) => {
         ) 
       WHERE id = ?
     `;
-    dbConnect.query(leadSumSql, [leadId, leadId], (sumErr, sumResult) => {
+    req.dbQuery(leadSumSql, [leadId, leadId], (sumErr, sumResult) => {
       if (sumErr) {
         console.error(
           "Error updating sanctionedAmount and disbursedAmount in leads table:",
@@ -352,7 +352,7 @@ const updateRevenueDetails = asyncHandler((req, res) => {
   });
   sql += ` WHERE id IN (${updates.map(update => "?").join(", ")})`;
   params.push(...updates.map(update => update.id));
-  dbConnect.query(sql, params, (err, result) => {
+  req.dbQuery(sql, params, (err, result) => {
     if (err) {
       console.error("updateRevenueDetails error in query:", err);
       return res.status(500).send("Error in updating Revenue details");
@@ -401,7 +401,7 @@ const updateApprovalsDetails = asyncHandler((req, res) => {
   });
   sql += ` WHERE id IN (${updates.map(() => "?").join(", ")})`;
   params.push(...updates.map(update => update.id));
-  dbConnect.query(sql, params, (err, result) => {
+  req.dbQuery(sql, params, (err, result) => {
     if (err) {
       console.error("updateApprovalsDetails error in query:", err);
       return res.status(500).send("Error in updating Approval details");
@@ -431,7 +431,7 @@ const updateApprovalsDetails = asyncHandler((req, res) => {
         )
       WHERE id = ?
     `;
-    dbConnect.query(
+    req.dbQuery(
       leadSumSql,
       [leadId, leadId, leadId, leadId, leadId],
       (sumErr, sumResult) => {
@@ -456,7 +456,7 @@ const updateApprovalsDetails = asyncHandler((req, res) => {
 
 const getApprovalsLeads = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctApprovedLeadIds();
+    const distinctLeadIds = await fetchDistinctApprovedLeadIds(req);
     if (distinctLeadIds.length === 0) {
       return res.status(200).json([]);
     }
@@ -467,7 +467,7 @@ const getApprovalsLeads = asyncHandler(async (req, res) => {
     queryParams["sort"] = "approvalDate";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error fetching approval details:", err);
         return res.status(500).send("Error in Fetching Approvals");
@@ -480,14 +480,14 @@ const getApprovalsLeads = asyncHandler(async (req, res) => {
     res.status(500).send("Error in Fetching Approval Leads");
   }
 });
-async function fetchDistinctApprovedLeadIds() {
+async function fetchDistinctApprovedLeadIds(req) {
   const sql = `
     SELECT DISTINCT leadId
     FROM logins
     WHERE fipStatus = 'approved'
   `;
   return new Promise((resolve, reject) => {
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -500,7 +500,7 @@ async function fetchDistinctApprovedLeadIds() {
 
 const getDisbursalLeads = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctDisbursedLeadIds();
+    const distinctLeadIds = await fetchDistinctDisbursedLeadIds(req);
     if (distinctLeadIds.length === 0) {
       return res.status(200).json([]);
     }
@@ -511,7 +511,7 @@ const getDisbursalLeads = asyncHandler(async (req, res) => {
     queryParams["sort"] = "disbursalDate";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error fetching disbursal details:", err);
         return res.status(500).send("Error in Fetching Disbursal Leads");
@@ -524,14 +524,14 @@ const getDisbursalLeads = asyncHandler(async (req, res) => {
     res.status(500).send("Error in Fetching Disbursal Leads");
   }
 });
-async function fetchDistinctDisbursedLeadIds() {
+async function fetchDistinctDisbursedLeadIds(req) {
   const sql = `
     SELECT DISTINCT leadId
     FROM logins
     WHERE approvedStatus = 'disbursed' AND fipStatus = 'approved'
   `;
   return new Promise((resolve, reject) => {
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -569,7 +569,7 @@ const updateDisbursalDetails = asyncHandler((req, res) => {
   });
   sql += ` WHERE id IN (${updates.map(update => "?").join(", ")})`;
   params.push(...updates.map(update => update.id));
-  dbConnect.query(sql, params, (err, result) => {
+  req.dbQuery(sql, params, (err, result) => {
     if (err) {
       console.error("updateDisbursalDetails error in query:", err);
       return res.status(500).send("Error in updating Disbursal Details");
@@ -580,7 +580,7 @@ const updateDisbursalDetails = asyncHandler((req, res) => {
 //rejects
 const getBankRejectsLeads = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctBankRejectedLeadIds();
+    const distinctLeadIds = await fetchDistinctBankRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
       return res.status(200).json([]);
     }
@@ -591,7 +591,7 @@ const getBankRejectsLeads = asyncHandler(async (req, res) => {
     queryParams["sort"] = "loginDate";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error fetching approval details:", err);
         return res.status(500).send("Error in Fetching Bank Rejected Leads");
@@ -605,14 +605,14 @@ const getBankRejectsLeads = asyncHandler(async (req, res) => {
   }
 });
 
-async function fetchDistinctBankRejectedLeadIds() {
+async function fetchDistinctBankRejectedLeadIds(req) {
   const sql = `
     SELECT DISTINCT leadId
     FROM logins
     WHERE fipStatus = 'rejected'
   `;
   return new Promise((resolve, reject) => {
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -625,7 +625,7 @@ async function fetchDistinctBankRejectedLeadIds() {
 
 const getBankRejectedLeadCount = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctBankRejectedLeadIds();
+    const distinctLeadIds = await fetchDistinctBankRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
       // return res.status(200).json({ count: 0 });
       return res.status(200).send("0");
@@ -636,7 +636,7 @@ const getBankRejectedLeadCount = asyncHandler(async (req, res) => {
     queryParams["id-or"] = inClause;
     const filtersQuery = handleGlobalFilters(queryParams, true);
     countSql += filtersQuery;
-    dbConnect.query(countSql, (err, countResult) => {
+    req.dbQuery(countSql, (err, countResult) => {
       if (err) {
         console.error("Error counting bank-rejected leads:", err);
         return res
@@ -653,7 +653,7 @@ const getBankRejectedLeadCount = asyncHandler(async (req, res) => {
 });
 const getCNIRejectsLeads = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds();
+    const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
       return res.status(200).json([]);
     }
@@ -664,7 +664,7 @@ const getCNIRejectsLeads = asyncHandler(async (req, res) => {
     queryParams["sort"] = "loginDate";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error fetching cni rejected details:", err);
         return res.status(500).send("Error in Fetching CNI Rejected Leads");
@@ -678,7 +678,7 @@ const getCNIRejectsLeads = asyncHandler(async (req, res) => {
   }
 });
 
-async function fetchDistinctCNIRejectedLeadIds() {
+async function fetchDistinctCNIRejectedLeadIds(req) {
   // const sql = `
   //   SELECT DISTINCT leadId
   //   FROM logins
@@ -689,7 +689,7 @@ FROM logins
 WHERE (fipStatus = 'approved' AND approvedStatus IN ('cnis', 'hold')) 
    OR fipStatus = 'hold'`;
   return new Promise((resolve, reject) => {
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -702,7 +702,7 @@ WHERE (fipStatus = 'approved' AND approvedStatus IN ('cnis', 'hold'))
 
 const getCNIRejectedLeadCount = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds();
+    const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
       // return res.status(200).json({ count: 0 });
       return res.status(200).send("0");
@@ -713,7 +713,7 @@ const getCNIRejectedLeadCount = asyncHandler(async (req, res) => {
     queryParams["id-or"] = inClause;
     const filtersQuery = handleGlobalFilters(queryParams, true);
     countSql += filtersQuery;
-    dbConnect.query(countSql, (err, countResult) => {
+    req.dbQuery(countSql, (err, countResult) => {
       if (err) {
         console.error("Error counting CNI-rejected leads:", err);
         return res
@@ -737,7 +737,7 @@ const getBankRejectsDetailsById = asyncHandler((req, res) => {
     WHERE leadId = ? AND fipStatus = 'rejected'
   `;
   const queryParams = [leadId];
-  dbConnect.query(sql, queryParams, (err, result) => {
+  req.dbQuery(sql, queryParams, (err, result) => {
     if (err) {
       console.error("getBankRejectsDetailsById error in controller:", err);
       return res.status(500).send("Error in Fetching Bank Rejects Details");
@@ -760,7 +760,7 @@ const getCNIRejectsDetailsById = asyncHandler((req, res) => {
     WHERE leadId = ? AND (fipStatus = 'hold' OR approvedStatus IN ('cnis', 'hold'))
   `;
   const queryParams = [leadId];
-  dbConnect.query(sql, queryParams, (err, result) => {
+  req.dbQuery(sql, queryParams, (err, result) => {
     if (err) {
       console.error("getCNIRejectsDetailsById error in controller:", err);
       return res.status(500).send("Error in Fetching CNI Details");
@@ -775,7 +775,7 @@ const getLoginsDoneById = asyncHandler((req, res) => {
   const queryParams = req.query;
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getLoginsDoneById Error in controller");
       return res.status(500).send("Error in Fetching Logins Done Details");
@@ -790,7 +790,7 @@ const getLoginsDoneCount = asyncHandler(async (req, res) => {
   const queryParams = req.query;
   const filtersQuery = handleGlobalFilters(queryParams, true);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("Error in getUsersCount:", err);
       res.status(500).send("Error in Fetching Logins Done Count");
@@ -807,7 +807,7 @@ const getTotalSanctionedAmountSum = asyncHandler(async (req, res) => {
     FROM logins Where fipStatus = 'approved'
    ;
   `;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getTotalSanctionedAmountSum error:", err);
       return res.status(500).send("Error in Fetching Sanctioned Amount ");
@@ -822,7 +822,7 @@ const getTotalDisbursedAmountSum = asyncHandler(async (req, res) => {
     SELECT SUM(disbursedAmount) AS total_disbursed_amount
     FROM logins WHERE approvedStatus = 'disbursed' AND fipStatus = 'approved';
   `;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getTotalSanctionedAmountSum error:", err);
       return res.status(500).send("Error in Fetching Disbursed Amount");
@@ -832,14 +832,14 @@ const getTotalDisbursedAmountSum = asyncHandler(async (req, res) => {
   });
 });
 
-async function fetchFIPProcessDistinctLeadIds() {
+async function fetchFIPProcessDistinctLeadIds(req) {
   const sql = `
 SELECT DISTINCT leadId
 FROM logins
 WHERE fipStatus NOT IN ('approved', 'rejected', 'hold');
   `;
   return new Promise((resolve, reject) => {
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -852,7 +852,7 @@ WHERE fipStatus NOT IN ('approved', 'rejected', 'hold');
 
 const getFIPProcessDistinctLeads = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchFIPProcessDistinctLeadIds();
+    const distinctLeadIds = await fetchFIPProcessDistinctLeadIds(req);
     if (distinctLeadIds.length === 0) {
       return res.status(200).json([]);
     }
@@ -863,7 +863,7 @@ const getFIPProcessDistinctLeads = asyncHandler(async (req, res) => {
     queryParams["sort"] = "loginDate";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error fetching leads:", err);
         res.status(500).send("Error in Fetching Files in Process leads");
@@ -879,7 +879,7 @@ const getFIPProcessDistinctLeads = asyncHandler(async (req, res) => {
 });
 const getFIPProcessDistinctLeadsCount = asyncHandler(async (req, res) => {
   try {
-    const distinctLeadIds = await fetchFIPProcessDistinctLeadIds();
+    const distinctLeadIds = await fetchFIPProcessDistinctLeadIds(req);
     if (distinctLeadIds.length === 0) {
       return res.status(200).send("0");
     }
@@ -889,7 +889,7 @@ const getFIPProcessDistinctLeadsCount = asyncHandler(async (req, res) => {
     queryParams["id-or"] = inClause;
     const filtersQuery = handleGlobalFilters(queryParams, true);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error counting leads:", err);
         return res.status(500).send("Error in Fetching Files in Process Count");
@@ -904,7 +904,7 @@ const getFIPProcessDistinctLeadsCount = asyncHandler(async (req, res) => {
 
 const deleteLogin = asyncHandler((req, res) => {
   const sql = `DELETE FROM logins WHERE id = ${req.params.id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("deleteLead error:", err);
       return res.status(500).send("Error In Deleting the Login Lead");

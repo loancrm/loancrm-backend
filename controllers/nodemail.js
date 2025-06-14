@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 async function getActiveSourcedByIds() {
     const sql = `SELECT id FROM users WHERE userType = 3 AND status = "Active"`;
     return new Promise((resolve, reject) => {
-        dbConnect.query(sql, (err, result) => {
+        req.dbQuery(sql, (err, result) => {
             if (err) {
                 reject(err);
                 return;
@@ -32,7 +32,7 @@ async function getJoiningDate(userId) {
         const sql = `SELECT joiningDate FROM users WHERE id = ?`;
 
         const result = await new Promise((resolve, reject) => {
-            dbConnect.query(sql, [userId], (err, result) => {
+            req.dbQuery(sql, [userId], (err, result) => {
                 if (err) {
                     reject(err);
                     return;
@@ -113,50 +113,50 @@ async function getLeadsAndCallbacksCountForActiveSources() {
 `;
         const [leadsCounts, loanLeadsCounts, callbacksCounts, leadsCountsThisMonth, loanleadsCountsThisMonth, callbacksCountsThisMonth, docsToday, docsThisMonth] = await Promise.all([
             new Promise((resolve, reject) => {
-                dbConnect.query(sqlLeads, [today, tomorrow, activeSourcedByIds], (err, result) => {
+                req.dbQuery(sqlLeads, [today, tomorrow, activeSourcedByIds], (err, result) => {
                     if (err) reject(err);
                     else resolve(result);
                 });
             }),
             new Promise((resolve, reject) => {
-                dbConnect.query(sqlLoanLeads, [today, tomorrow, activeSourcedByIds], (err, result) => {
+                req.dbQuery(sqlLoanLeads, [today, tomorrow, activeSourcedByIds], (err, result) => {
                     if (err) reject(err);
                     else resolve(result);
                 });
             }),
             new Promise((resolve, reject) => {
-                dbConnect.query(sqlCallbacks, [today, tomorrow, activeSourcedByIds], (err, result) => {
+                req.dbQuery(sqlCallbacks, [today, tomorrow, activeSourcedByIds], (err, result) => {
                     if (err) reject(err);
                     else resolve(result);
                 });
             }),
             new Promise((resolve, reject) => {
-                dbConnect.query(sqlLeadsThisMonth, [firstDayOfMonth, nextMonth, activeSourcedByIds], (err, result) => {
+                req.dbQuery(sqlLeadsThisMonth, [firstDayOfMonth, nextMonth, activeSourcedByIds], (err, result) => {
                     if (err) reject(err);
                     else resolve(result);
                 });
             }),
             new Promise((resolve, reject) => {
-                dbConnect.query(sqlLoanLeadsThisMonth, [firstDayOfMonth, nextMonth, activeSourcedByIds], (err, result) => {
+                req.dbQuery(sqlLoanLeadsThisMonth, [firstDayOfMonth, nextMonth, activeSourcedByIds], (err, result) => {
                     if (err) reject(err);
                     else resolve(result);
                 });
             }),
             new Promise((resolve, reject) => {
-                dbConnect.query(sqlCallbacksThisMonth, [firstDayOfMonth, nextMonth, activeSourcedByIds], (err, result) => {
+                req.dbQuery(sqlCallbacksThisMonth, [firstDayOfMonth, nextMonth, activeSourcedByIds], (err, result) => {
                     if (err) reject(err);
                     else resolve(result);
                 });
             }),
             new Promise((resolve, reject) => {
-                dbConnect.query(
+                req.dbQuery(
                     `SELECT leadId FROM leaddocuments WHERE createdOn >= ? AND createdOn < ?`,
                     [today, tomorrow],
                     (err, result) => (err ? reject(err) : resolve(result))
                 );
             }),
             new Promise((resolve, reject) => {
-                dbConnect.query(
+                req.dbQuery(
                     `SELECT leadId FROM leaddocuments WHERE createdOn >= ? AND createdOn < ?`,
                     [firstDayOfMonth, nextMonth],
                     (err, result) => (err ? reject(err) : resolve(result))
@@ -176,7 +176,7 @@ async function getLeadsAndCallbacksCountForActiveSources() {
         }
         // Step 3: Get sourcedBy for all involved leadIds
         const [leadSourcing] = await new Promise((resolve, reject) => {
-            dbConnect.query(
+            req.dbQuery(
                 `SELECT id, sourcedBy FROM leads WHERE id IN (${allLeadIds.map(() => '?').join(',')}) AND leadInternalStatus != 4`,
                 allLeadIds,
                 (err, result) => (err ? reject(err) : resolve([result]))

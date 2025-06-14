@@ -13,7 +13,7 @@ const getCallBacksCount = asyncHandler(async (req, res) => {
   let sql = "SELECT count(*) as callBacksCount FROM callbacks";
   const filtersQuery = handleGlobalFilters(req.query, true);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getCallBacksCount error");
       return res.status(500).send("Error in Fetching the Callbacks Count");
@@ -29,7 +29,7 @@ const getCallBacks = asyncHandler(async (req, res) => {
   queryParams["sort"] = "createdOn";
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getCallBacks error:");
       return res.status(500).send("Error in Fetching the Callbacks");
@@ -41,7 +41,7 @@ const getCallBacks = asyncHandler(async (req, res) => {
 
 const getCallBackById = asyncHandler((req, res) => {
   const sql = `SELECT * FROM callbacks WHERE id = ${req.params.id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getCallBackById error:");
       return res.status(500).send("Error in Fetching the Callback Details");
@@ -55,7 +55,7 @@ const getCallBackById = asyncHandler((req, res) => {
 const createCallBack = asyncHandler(async (req, res) => {
   const phoneNumber = req.body.phone;
   const checkPhoneQuery = `SELECT * FROM callbacks WHERE phone = ?`;
-  dbConnect.query(checkPhoneQuery, [phoneNumber], async (err, result) => {
+  req.dbQuery(checkPhoneQuery, [phoneNumber], async (err, result) => {
     if (err) {
       console.error("Error checking phone number:", err);
       return res.status(500).send("Error in Checking Phone Number");
@@ -82,7 +82,7 @@ const createCallBack = asyncHandler(async (req, res) => {
         req.body["lastUpdatedBy"] = req.user.name;
         const createClause = createClauseHandler(req.body);
         const sql = `INSERT INTO callbacks (${createClause[0]}) VALUES (${createClause[1]})`;
-        dbConnect.query(sql, (err, result) => {
+        req.dbQuery(sql, (err, result) => {
           if (err) {
             console.log("createCallBack error:");
             return res.status(500).send("Error in Creating the Callback");
@@ -102,7 +102,7 @@ const updateCallBack = asyncHandler(async (req, res) => {
     return res.status(422).send("Please fill all required fields");
   }
   const checkPhoneQuery = `SELECT * FROM callbacks WHERE phone = ? AND id != ?`;
-  dbConnect.query(checkPhoneQuery, [phone, id], async (err, result) => {
+  req.dbQuery(checkPhoneQuery, [phone, id], async (err, result) => {
     if (err) {
       console.error("Error checking phone number:", err);
       return res.status(500).send("Error in Checking Phone Number");
@@ -124,7 +124,7 @@ const updateCallBack = asyncHandler(async (req, res) => {
     req.body["lastUpdatedBy"] = req.user.name;
     const updateClause = updateClauseHandler(req.body);
     const updateSql = `UPDATE callbacks SET ${updateClause} WHERE id = ?`;
-    dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
+    req.dbQuery(updateSql, [id], (updateErr, updateResult) => {
       if (updateErr) {
         console.error("updateCallBack error:", updateErr);
         return res.status(500).send("Error in Updating the Callback");
@@ -139,7 +139,7 @@ const changeCallbackStatus = asyncHandler((req, res) => {
   const id = req.params.callBackId;
   const statusId = req.params.statusId;
   const createSql = `SELECT * FROM callbacks WHERE id = ${id}`;
-  dbConnect.query(createSql, (err, result) => {
+  req.dbQuery(createSql, (err, result) => {
     if (err) {
       console.log("changeCallbackStatus error:");
       return res.status(500).send("Error in Updating the Callback");
@@ -151,7 +151,7 @@ const changeCallbackStatus = asyncHandler((req, res) => {
       };
       const updateClause = updateClauseHandler(statusData);
       const sql = `UPDATE callbacks SET ${updateClause} WHERE id = ${id}`;
-      dbConnect.query(sql, (err, result) => {
+      req.dbQuery(sql, (err, result) => {
         if (err) {
           console.log("changeCallbackStatus and updatecalss error:");
           return res.status(500).send("Error in Updating the Callback Status");
@@ -165,7 +165,7 @@ const changeCallbackStatus = asyncHandler((req, res) => {
 });
 // const deleteCallBack = asyncHandler((req, res) => {
 //   const sql = `DELETE FROM callbacks WHERE id = ${req.params.id}`;
-//   dbConnect.query(sql, (err, result) => {
+//   req.dbQuery(sql, (err, result) => {
 //     if (err) {
 //       console.log("deleteCallBack error:");
 //     }
@@ -174,7 +174,7 @@ const changeCallbackStatus = asyncHandler((req, res) => {
 // });
 const deleteCallBack = asyncHandler((req, res) => {
   const sql = `DELETE FROM callbacks WHERE callBackId = '${req.params.id}'`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("deleteCallBack error:", err);
       return res.status(500).send("Error In Deleting the Callback");
@@ -197,7 +197,7 @@ const getTotalCallbacksCountArray = asyncHandler(async (req, res) => {
   const queryParams = req.query;
   const filtersQuery = handleGlobalFilters(queryParams, true);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getTotalCallbacksCountArray error in controller", err);
       return res.status(500).send("Error in fetching Callbacks Count");
@@ -224,7 +224,7 @@ const getStatusCallbacksCountArray = asyncHandler(async (req, res) => {
   const queryParams = req.query;
   const filtersQuery = handleGlobalFilters(queryParams, true);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getStatusLeadsCountArray error in controller", err);
       return res.status(500).send("Error in fetching Callbacks Employment Status Count");

@@ -14,7 +14,7 @@ const getloanLeadsCount = asyncHandler(async (req, res) => {
     let sql = "SELECT count(*) as leadsCount FROM loanleads";
     const filtersQuery = handleGlobalFilters(req.query, true);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("getloanLeadsCount error in controller");
             return res.status(500).send("Error in fetching the Loan Leads Count");
@@ -36,7 +36,7 @@ const getTotalLeadsCountArray = asyncHandler(async (req, res) => {
     // queryParams["leadInternalStatus-eq"] = 1; // Applying the internal status filter
     const filtersQuery = handleGlobalFilters(queryParams, true);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("getTotalLeadsCountArray error in controller", err);
             return res.status(500).send("Error in fetching Loan Leads Count");
@@ -63,7 +63,7 @@ const getStatusLeadsCountArray = asyncHandler(async (req, res) => {
     // queryParams["leadInternalStatus-eq"] = 1; // Applying the internal status filter
     const filtersQuery = handleGlobalFilters(queryParams, true);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("getStatusLeadsCountArray error in controller", err);
             return res.status(500).send("Error in fetching Loan Leads Employment Status Count");
@@ -84,7 +84,7 @@ const getloanLeads = asyncHandler(async (req, res) => {
     queryParams["sort"] = "createdOn";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("getloanLeads Error in controller");
             return res.status(500).send("Error in fetching the Loan Leads");
@@ -96,7 +96,7 @@ const getloanLeads = asyncHandler(async (req, res) => {
 
 const getLoanLeadById = asyncHandler((req, res) => {
     const sql = `SELECT * FROM loanleads WHERE leadId = ${req.params.id}`;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("getLoanLeadById error in controller");
             return res.status(500).send("Error in fetching the Loan Lead Details");
@@ -117,7 +117,7 @@ const createLoanLead = asyncHandler((req, res) => {
     const filtersQuery = handleGlobalFilters(queryParams);
     checkPhoneQuery += filtersQuery;
     console.log(checkPhoneQuery)
-    dbConnect.query(checkPhoneQuery, (err, result) => {
+    req.dbQuery(checkPhoneQuery, (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
             return res.status(500).send("Error in checking phone number");
@@ -138,7 +138,7 @@ const createLoanLead = asyncHandler((req, res) => {
                 req.body["lastUpdatedBy"] = req.user.name;
                 const createClause = createClauseHandler(req.body);
                 const sql = `INSERT INTO loanleads (${createClause[0]}) VALUES (${createClause[1]})`;
-                dbConnect.query(sql, (err, result) => {
+                req.dbQuery(sql, (err, result) => {
                     if (err) {
                         console.log("createLoanLead error:");
                         return res.status(500).send("Error in creating the Loan Lead");
@@ -167,7 +167,7 @@ const updateLoanLead = asyncHandler((req, res) => {
     let sql = ` AND leadId != ${id}`
     checkPhoneQuery += sql;
     console.log(checkPhoneQuery)
-    dbConnect.query(checkPhoneQuery, [primaryPhone, id], (err, result) => {
+    req.dbQuery(checkPhoneQuery, [primaryPhone, id], (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
             return res.status(500).send("Error in Checking the Phone Number");
@@ -183,7 +183,7 @@ const updateLoanLead = asyncHandler((req, res) => {
         req.body["lastUpdatedBy"] = req.user.name;
         const updateClause = updateClauseHandler(req.body);
         const updateSql = `UPDATE loanleads SET ${updateClause} WHERE leadId = ?`;
-        dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
+        req.dbQuery(updateSql, [id], (updateErr, updateResult) => {
             if (updateErr) {
                 console.error("updateLoanLead error in controller:", updateErr);
                 return res.status(500).send("Error in updating the Loan Lead");
@@ -195,7 +195,7 @@ const updateLoanLead = asyncHandler((req, res) => {
 
 const deleteLoanLead = asyncHandler((req, res) => {
     const sql = `DELETE FROM loanleads WHERE leadId = ${req.params.id}`;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("deleteLoanLead error in controller");
             return res.status(500).send("Error In Deleting the Lead");
@@ -208,7 +208,7 @@ const changeLoanLeadStatus = asyncHandler((req, res) => {
     const id = req.params.leadId;
     const statusId = req.params.statusId;
     const createSql = `SELECT * FROM loanleads WHERE leadId = ${id}`;
-    dbConnect.query(createSql, (err, result) => {
+    req.dbQuery(createSql, (err, result) => {
         if (err) {
             console.log("changeLeadStatus error in controller");
             return res.status(500).send("Error in Finding the Lead Id");
@@ -220,7 +220,7 @@ const changeLoanLeadStatus = asyncHandler((req, res) => {
             };
             const updateClause = updateClauseHandler(statusData);
             const sql = `UPDATE loanleads SET ${updateClause} WHERE leadId = ${id}`;
-            dbConnect.query(sql, (err, result) => {
+            req.dbQuery(sql, (err, result) => {
                 if (err) {
                     console.log("changeLoanLeadStatus error in controller");
                     return res.status(500).send("Error in updating the Loan Lead Status");
@@ -237,7 +237,7 @@ const addLoanLeadsDocumentData = asyncHandler((req, res) => {
     const id = req.params.leadId;
     const updateClause = updateClauseHandler(req.body);
     const sql = `UPDATE loanleads SET ${updateClause} WHERE leadId = ${id}`;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("addLoanLeadsDocumentData error in controller");
             return res.status(500).send("Error in updating the Loan Leads Document  Details");
@@ -259,7 +259,7 @@ const createLoanLeadFromCallback = asyncHandler(async (req, res) => {
     const filtersQuery = handleGlobalFilters(queryParams);
     checkPhoneQuery += filtersQuery;
     console.log(checkPhoneQuery)
-    dbConnect.query(checkPhoneQuery, async (err, result) => {
+    req.dbQuery(checkPhoneQuery, async (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
             return res.status(500).send("Error in Checking the Phone Number");
@@ -291,7 +291,7 @@ function createNewLoanLeadFromCallback(req, res) {
     req.body["lastUpdatedBy"] = req.user.name;
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO loanleads (${createClause[0]}) VALUES (${createClause[1]})`;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.error("Error inserting data into leads table:", err);
             res.status(500).send("Internal server error");

@@ -5,7 +5,7 @@ const createDscrTable = asyncHandler(async (req, res) => {
   const { id } = req.body;
   const createdBy = req.user.name;
   const checkQuery = `SELECT * FROM dscr_values WHERE leadId = ?`;
-  dbConnect.query(checkQuery, [id], (checkErr, checkResult) => {
+  req.dbQuery(checkQuery, [id], (checkErr, checkResult) => {
     if (checkErr) {
       console.error(
         "Error checking existing id in dscr_values table:",
@@ -21,7 +21,7 @@ const createDscrTable = asyncHandler(async (req, res) => {
         );
     }
     const sql = `INSERT INTO dscr_values (leadId, createdBy, lastUpdatedBy) VALUES (?, ?, ?)`;
-    dbConnect.query(sql, [id, createdBy, createdBy], (err, result) => {
+    req.dbQuery(sql, [id, createdBy, createdBy], (err, result) => {
       if (err) {
         console.error("Error inserting data into dscr_values table:", err);
         return res.status(500).send("Internal server error");
@@ -35,7 +35,7 @@ const createDscrTable = asyncHandler(async (req, res) => {
 const createleadDocumentsTable = asyncHandler(async (req, res) => {
   const { id } = req.body;
   const checkQuery = `SELECT * FROM leaddocuments WHERE leadId = ?`;
-  dbConnect.query(checkQuery, [id], (checkErr, checkResult) => {
+  req.dbQuery(checkQuery, [id], (checkErr, checkResult) => {
     if (checkErr) {
       console.error("Error checking existing id in leaddocuments table:", checkErr);
       return res.status(500).send("Internal server error");
@@ -44,7 +44,7 @@ const createleadDocumentsTable = asyncHandler(async (req, res) => {
       return res.status(200).send(`ID ${id} already exists in leaddocuments table. Just upload the files.`);
     }
     const sql = `INSERT INTO leaddocuments (leadId,createdBy,lastUpdatedBy) VALUES (?,?,?)`;
-    dbConnect.query(sql, [id, req.user.name, req.user.name], (err, result) => {
+    req.dbQuery(sql, [id, req.user.name, req.user.name], (err, result) => {
       if (err) {
         console.error("Error inserting data into leaddocuments table:", err);
         return res.status(500).send("Internal server error");

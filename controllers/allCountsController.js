@@ -9,7 +9,7 @@ const getLeadCountStatus = asyncHandler(async (req, res) => {
   queryParams["leadInternalStatus-or"] = "1";
   const filtersQuery = handleGlobalFilters(req.query);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       return res.status(500).send("Error in Fetching the Lead Count");
@@ -26,7 +26,7 @@ const getCallbackCountStatus = asyncHandler(async (req, res) => {
   queryParams["callbackInternalStatus-or"] = "1";
   const filtersQuery = handleGlobalFilters(req.query);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       return res.status(500).send("Error in Fetching the Callback Count");
@@ -45,7 +45,7 @@ const getFilesCountStatus = asyncHandler(async (req, res) => {
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
 
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching the Files Count");
@@ -65,7 +65,7 @@ const getRejectedCountStatus = asyncHandler(async (req, res) => {
   queryParams["leadInternalStatus-eq"] = "10";
   const filtersQuery = handleGlobalFilters(req.query);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching Rejected Count");
@@ -84,7 +84,7 @@ const getLoginsCountStatus = asyncHandler(async (req, res) => {
   queryParams["leadInternalStatus-eq"] = "11";
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching Logins Count");
@@ -104,7 +104,7 @@ const getLoginsCountStatus = asyncHandler(async (req, res) => {
 //   queryParams["leadInternalStatus-eq"] = "4";
 //   const filtersQuery = handleGlobalFilters(queryParams);
 //   sql += filtersQuery;
-//   dbConnect.query(sql, (err, result) => {
+//   req.dbQuery(sql, (err, result) => {
 //     if (err) {
 //       console.error("Error:", err);
 //       res.status(500).send("Error in Fetching the Partials Count");
@@ -124,7 +124,7 @@ const getCreditEvaluationCountStatus = asyncHandler(async (req, res) => {
   `;
   const filtersQuery = handleGlobalFilters(req.query);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching Credit Evaluation Count");
@@ -155,7 +155,7 @@ const getMonthWiseLeadCountStatus = asyncHandler(async (req, res) => {
       seq DESC;
   `;
 
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching the Month wise Leads Count");
@@ -182,7 +182,7 @@ FROM
 (SELECT 0 AS seq UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) AS seq
 ORDER BY 
 seq DESC; `
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching Monthwise Callback Count");
@@ -203,7 +203,7 @@ const getPast7DaysLeadCountStatus = asyncHandler(async (req, res) => {
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`;
   sql += sql2;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching past 7 days Lead Count");
@@ -224,7 +224,7 @@ FROM callbacks`;
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`;
   sql += sql2;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching Past 7 days Callback Count");
@@ -255,7 +255,7 @@ FROM leads`;
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     [lastMonthStartDate, lastMonthEndDate],
     (err, result) => {
@@ -287,7 +287,7 @@ const getThisMonthLeadCountStatus = asyncHandler(async (req, res) => {
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     [thisMonthStartDate, thisMonthEndDate],
     (err, result) => {
@@ -323,7 +323,7 @@ const getLastBeforeMonthLeadCountStatus = asyncHandler(async (req, res) => {
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     [lastBeforeMonthStartDate, lastBeforeMonthEndDate],
     (err, result) => {
@@ -359,7 +359,7 @@ FROM callbacks`;
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     [lastMonthStartDate, lastMonthEndDate],
     (err, result) => {
@@ -392,7 +392,7 @@ const getThisMonthCallBacksCount = asyncHandler(async (req, res) => {
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
 
-  dbConnect.query(
+  req.dbQuery(
     sql,
     [thisMonthStartDate, thisMonthEndDate],
     (err, result) => {
@@ -428,7 +428,7 @@ const getTwoMonthsAgoCallBacksCount = asyncHandler(async (req, res) => {
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     [twoMonthsAgoStartDate, twoMonthsAgoEndDate],
     (err, result) => {
@@ -467,7 +467,7 @@ const getLast6MonthsLeadCountStatus = asyncHandler(async (req, res) => {
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     [last6MonthsStartDate, lastMonthEndDate],
     (err, result) => {
@@ -504,7 +504,7 @@ const getLast6MonthsCallBacksCount = asyncHandler(async (req, res) => {
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     [last6MonthsStartDate, lastMonthEndDate],
     (err, result) => {
@@ -537,7 +537,7 @@ const getLastYearLeadCountStatus = asyncHandler(async (req, res) => {
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(sql, [lastYearStartDate, lastYearEndDate], (err, result) => {
+  req.dbQuery(sql, [lastYearStartDate, lastYearEndDate], (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching last year Leads Count");
@@ -566,7 +566,7 @@ const getLastYearCallBacksCount = asyncHandler(async (req, res) => {
   sql += filtersQuery;
   let sql2 = ` AND createdOn >= ? AND createdOn <= ?`;
   sql += sql2;
-  dbConnect.query(sql, [lastYearStartDate, lastYearEndDate], (err, result) => {
+  req.dbQuery(sql, [lastYearStartDate, lastYearEndDate], (err, result) => {
     if (err) {
       console.error("Error:", err);
       res.status(500).send("Error in Fetching last year Callbacks Count");
@@ -585,7 +585,7 @@ const getDisbursedAmount = asyncHandler(async (req, res) => {
   queryParams["approvedStatus-eq"] = "disbursed";
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     (err, result) => {
       if (err) {
@@ -607,7 +607,7 @@ const getSanctionedAmount = asyncHandler(async (req, res) => {
   queryParams["fipStatus-eq"] = "approved";
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(
+  req.dbQuery(
     sql,
     (err, result) => {
       if (err) {
@@ -626,7 +626,7 @@ async function fetchLeadIds(req) {
   const filtersQuery = handleGlobalFilters(queryParams);
   const sql = `SELECT id AS leadId FROM leads ${filtersQuery}`;
   return new Promise((resolve, reject) => {
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -665,7 +665,7 @@ const getuserLastMonthSanctionedAmount = asyncHandler(async (req, res) => {
     AND approvalDate <= ?
     AND leadId IN (${placeholders})
     `;
-    dbConnect.query(
+    req.dbQuery(
       sql,
       [lastMonthStartDate, lastMonthEndDate, ...leadIds],
       (err, result) => {
@@ -701,7 +701,7 @@ const getuserLastMonthDisbursedAmount = asyncHandler(async (req, res) => {
         AND disbursalDate <= ?
         AND leadId IN (${placeholders})
     `;
-    dbConnect.query(
+    req.dbQuery(
       sql,
       [lastMonthStartDate, lastMonthEndDate, ...leadIds],
       (err, result) => {
@@ -750,7 +750,7 @@ const getuserCurrentMonthSanctionedAmount = asyncHandler(async (req, res) => {
     // console.log(currentMonthStartDate)
     // console.log(currentMonthEndDate)
     // console.log(sql);
-    dbConnect.query(
+    req.dbQuery(
       sql,
       [currentMonthStartDate, currentMonthEndDate, ...leadIds],
       (err, result) => {
@@ -786,7 +786,7 @@ const getuserCurrentMonthDisbursedAmount = asyncHandler(async (req, res) => {
         AND disbursalDate <= ?
         AND leadId IN (${placeholders})
     `;
-    dbConnect.query(
+    req.dbQuery(
       sql,
       [currentMonthStartDate, currentMonthEndDate, ...leadIds],
       (err, result) => {
@@ -832,7 +832,7 @@ const getuserLastLastMonthSanctionedAmount = asyncHandler(async (req, res) => {
       AND approvalDate <= ?
       AND leadId IN (${placeholders})
   `;
-    dbConnect.query(
+    req.dbQuery(
       sql,
       [lastLastMonthStartDate, lastLastMonthEndDate, ...leadIds],
       (err, result) => {
@@ -868,7 +868,7 @@ const getuserLastLastMonthDisbursedAmount = asyncHandler(async (req, res) => {
       AND disbursalDate <= ?
       AND leadId IN (${placeholders})
     `;
-    dbConnect.query(
+    req.dbQuery(
       sql,
       [lastLastMonthStartDate, lastLastMonthEndDate, ...leadIds],
       (err, result) => {
@@ -915,7 +915,7 @@ const getuserTwoMonthsAgoSanctionedAmount = asyncHandler(async (req, res) => {
       AND approvalDate <= ?
       AND leadId IN (${placeholders})
   `;
-    dbConnect.query(
+    req.dbQuery(
       sql,
       [twoMonthsAgoStartDate, twoMonthsEgoEndDate, ...leadIds],
       (err, result) => {
@@ -951,7 +951,7 @@ const getuserTwoMonthsAgoDisbursedAmount = asyncHandler(async (req, res) => {
       AND disbursalDate <= ?
       AND leadId IN (${placeholders})
     `;
-    dbConnect.query(
+    req.dbQuery(
       sql,
       [twoMonthsAgoStartDate, twoMonthsEgoEndDate, ...leadIds],
       (err, result) => {

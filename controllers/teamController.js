@@ -17,7 +17,7 @@ const createUsers = asyncHandler(async (req, res) => {
   req.body["lastUserInternalStatus"] = 1;
   req.body["password"] = encryptedPassword;
   const checkIfExistsQuery = `SELECT * FROM users WHERE (email = ? OR phone = ?)`;
-  dbConnect.query(checkIfExistsQuery, [req.body.email, req.body.phone], (err, results) => {
+  req.dbQuery(checkIfExistsQuery, [req.body.email, req.body.phone], (err, results) => {
     if (err) {
       console.error("Error checking if user exists:", err);
       return res.status(500).send("Error in Checking Email or Phone Number");
@@ -27,7 +27,7 @@ const createUsers = asyncHandler(async (req, res) => {
     }
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO users (${createClause[0]}) VALUES (${createClause[1]})`;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error creating user:", err);
         return res.status(500).send("Error in Creating User");
@@ -42,7 +42,7 @@ const createUsers = asyncHandler(async (req, res) => {
       const rbacValue = rbacValues[req.body.userType];
       if (rbacValue) {
         const updateRbacQuery = `UPDATE users SET rbac = ? WHERE id = ?`;
-        dbConnect.query(updateRbacQuery, [rbacValue, result.insertId], (err, updateResult) => {
+        req.dbQuery(updateRbacQuery, [rbacValue, result.insertId], (err, updateResult) => {
           if (err) {
             console.error("Error updating RBAC:", err);
             return res.status(500).send("Error in Updating RBAC");
@@ -63,7 +63,7 @@ const updateUsers = asyncHandler(async (req, res) => {
   let encryptedPassword = await bcrypt.hash(phoneNumber, 12);
   req.body["password"] = encryptedPassword;
   const checkIfExistsQuery = `SELECT * FROM users WHERE (email = ? OR phone = ?) AND id != ?`;
-  dbConnect.query(checkIfExistsQuery, [req.body.email, req.body.phone, req.params.id], (err, results) => {
+  req.dbQuery(checkIfExistsQuery, [req.body.email, req.body.phone, req.params.id], (err, results) => {
     if (err) {
       console.error("Error checking if user exists:", err);
       return res.status(500).send("Error in Checking Eamil Or Phone Number");
@@ -74,7 +74,7 @@ const updateUsers = asyncHandler(async (req, res) => {
     }
     const updateClause = updateClauseHandler(req.body);
     const sql = `UPDATE users SET ${updateClause} WHERE id = ${id}`;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.log("updateUsers error in controller");
         return res.status(500).send("Error in Updating User");
@@ -89,7 +89,7 @@ const updateUsers = asyncHandler(async (req, res) => {
       const rbacValue = rbacValues[req.body.userType];
       if (rbacValue) {
         const updateRbacQuery = `UPDATE users SET rbac = ? WHERE id = ?`;
-        dbConnect.query(updateRbacQuery, [rbacValue, id], (err, updateResult) => {
+        req.dbQuery(updateRbacQuery, [rbacValue, id], (err, updateResult) => {
           if (err) {
             console.error("Error updating RBAC:", err);
             return res.status(500).send("Error in Updating RBAC");
@@ -110,7 +110,7 @@ const updateUsers = asyncHandler(async (req, res) => {
 //   req.body["password"] = encryptedPassword;
 //   const updateClause = updateClauseHandler(req.body);
 //   const sql = `UPDATE users SET ${updateClause} WHERE id = ${id}`;
-//   dbConnect.query(sql, (err, result) => {
+//   req.dbQuery(sql, (err, result) => {
 //     if (err) {
 //       console.log("updateUsers error in controller");
 //       return res.status(500).send("Error in Updating User");
@@ -125,7 +125,7 @@ const updateUsers = asyncHandler(async (req, res) => {
 //     const rbacValue = rbacValues[req.body.userType];
 //     if (rbacValue) {
 //       const updateRbacQuery = `UPDATE users SET rbac = ? WHERE id = ?`;
-//       dbConnect.query(updateRbacQuery, [rbacValue, id], (err, updateResult) => {
+//       req.dbQuery(updateRbacQuery, [rbacValue, id], (err, updateResult) => {
 //         if (err) {
 //           console.error("Error updating RBAC:", err);
 //           return res.status(500).send("Error in Updating RBAC");
@@ -140,7 +140,7 @@ const updateUsers = asyncHandler(async (req, res) => {
 
 // const deleteUsers = asyncHandler((req, res) => {
 //   const sql = `DELETE FROM users WHERE id = ${req.params.id}`;
-//   dbConnect.query(sql, (err, result) => {
+//   req.dbQuery(sql, (err, result) => {
 //     if (err) {
 //       console.log("deleteusers error in controller");
 //     }
@@ -150,7 +150,7 @@ const updateUsers = asyncHandler(async (req, res) => {
 
 const deleteUsers = asyncHandler((req, res) => {
   const sql = `DELETE FROM users WHERE id = ${req.params.id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("deleteUsers error:", err);
       return res.status(500).send("Error In Deleting the User");
@@ -161,7 +161,7 @@ const deleteUsers = asyncHandler((req, res) => {
 
 const getUsersById = asyncHandler((req, res) => {
   const sql = `SELECT * FROM users WHERE id = ${req.params.id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getUsersById error in controller");
       return res.status(500).send("Error in Fetching User");
@@ -176,7 +176,7 @@ const getUsers = asyncHandler(async (req, res) => {
   const queryParams = req.query;
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getUsers Error in controller");
       return res.status(500).send("Error in Fetching Users");
@@ -187,7 +187,7 @@ const getUsers = asyncHandler(async (req, res) => {
 });
 function fetchUsers() {
   return new Promise((resolve, reject) => {
-    dbConnect.query("SELECT * FROM users", (err, results) => {
+    req.dbQuery("SELECT * FROM users", (err, results) => {
       if (err) {
         return reject(err);
       }
@@ -210,7 +210,7 @@ const getActiveUsers = asyncHandler(async (req, res) => {
   let sql = "SELECT * FROM users WHERE status = 'Active'";
   const filtersQuery = handleGlobalFilters(req.query);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getUsers Error in controller");
       return res.status(500).send("Error in Fetching Active Users");
@@ -224,7 +224,7 @@ const getActiveUsersCount = asyncHandler(async (req, res) => {
   let sql = "SELECT COUNT(*) AS activeUsersCount FROM users WHERE status = 'Active'";
   const filtersQuery = handleGlobalFilters(req.query);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getActiveUsersCount Error in controller");
       return res.status(500).send("Error in Fetching Active Users Count");
@@ -238,7 +238,7 @@ const getUsersCount = asyncHandler(async (req, res) => {
   let sql = "SELECT count(*) as usersCount FROM users";
   const filtersQuery = handleGlobalFilters(req.query, true);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("Error in getUsersCount:", err);
       return res.status(500).send("Error in Fetching Users Count");
@@ -252,7 +252,7 @@ const getUserRoles = asyncHandler(async (req, res) => {
   let sql = "SELECT * FROM userrole";
   const filtersQuery = handleGlobalFilters(req.query);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getUserRoles Error in Controller");
       return res.status(500).send("Error in Fetching User Roles");
@@ -265,7 +265,7 @@ const updateUserStatus = asyncHandler(async (req, res) => {
   const userId = req.params.userId;
   const { status } = req.body;
   const sql = "UPDATE users SET status = ? WHERE id = ?";
-  dbConnect.query(sql, [status, userId], (err, result) => {
+  req.dbQuery(sql, [status, userId], (err, result) => {
     if (err) {
       console.error("Error updating user status:", err);
       return res.status(500).send("Error updating user status");

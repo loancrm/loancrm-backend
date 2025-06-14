@@ -13,7 +13,7 @@ const getBankersCount = asyncHandler(async (req, res) => {
   let sql = "SELECT count(*) as bankersCount FROM bankers";
   const filtersQuery = handleGlobalFilters(req.query, true);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getBankersCount error");
       return res.status(500).send("Error in Fetching the Lenders Count");
@@ -30,7 +30,7 @@ const getNewBankersCount = asyncHandler(async (req, res) => {
   queryParams["bankerInternalStatus-eq"] = "1";
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getBankersCount error");
       return res.status(500).send("Error in Fetching the New Lenders Count");
@@ -45,7 +45,7 @@ const getBankers = asyncHandler(async (req, res) => {
   queryParams["sort"] = "createdOn";
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getBankers error:");
       return res.status(500).send("Error in Fetching the Lenders");
@@ -60,7 +60,7 @@ const getBanks = asyncHandler(async (req, res) => {
   const filtersQuery = handleGlobalFilters(req.body);
   sql += filtersQuery;
   sql += " ORDER BY name ASC";
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getBanks error:", err);
       return res.status(500).send("Error retrieving banks");
@@ -75,7 +75,7 @@ const getBanks = asyncHandler(async (req, res) => {
 });
 const getBankersById = asyncHandler((req, res) => {
   const sql = `SELECT * FROM bankers WHERE id = ${req.params.id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getBankersById error:");
       return res.status(500).send("Error in Fetching the Lender Details");
@@ -94,7 +94,7 @@ const createBanker = asyncHandler((req, res) => {
     req.body["createdBy"] = req.user.name;
     req.body["lastUpdatedBy"] = req.user.name;
     const checkSql = `SELECT * FROM bankers WHERE name = ?`;
-    dbConnect.query(checkSql, [req.body.name], (checkErr, checkResult) => {
+    req.dbQuery(checkSql, [req.body.name], (checkErr, checkResult) => {
       if (checkErr) {
         console.error("createBanker check error:", checkErr);
         return res.status(500).send("Error in Checking the Lender");
@@ -104,7 +104,7 @@ const createBanker = asyncHandler((req, res) => {
       }
       const createClause = createClauseHandler(req.body);
       const insertSql = `INSERT INTO bankers (${createClause[0]}) VALUES (${createClause[1]})`;
-      dbConnect.query(insertSql, (err, result) => {
+      req.dbQuery(insertSql, (err, result) => {
         if (err) {
           console.error("createBanker insertion error:", err);
           return res.status(500).send("Error in Creating the Lender");
@@ -128,7 +128,7 @@ const updateBanker = asyncHandler((req, res) => {
   req.body["lastUpdatedBy"] = req.user.name;
   const updateClause = updateClauseHandler(req.body);
   const sql = `UPDATE bankers SET ${updateClause} WHERE id = ${id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("updateBanker error:");
       return res.status(500).send("Error in Updating the Lender");
@@ -141,7 +141,7 @@ const changeBankersStatus = asyncHandler((req, res) => {
   const id = req.params.bankerId;
   const statusId = req.params.statusId;
   const createSql = `SELECT * FROM bankers WHERE id = ${id}`;
-  dbConnect.query(createSql, (err, result) => {
+  req.dbQuery(createSql, (err, result) => {
     if (err) {
       console.log("changeBankersStatus error:");
       return res.status(500).send("Error in Updating the Lender");
@@ -153,7 +153,7 @@ const changeBankersStatus = asyncHandler((req, res) => {
       };
       const updateClause = updateClauseHandler(statusData);
       const sql = `UPDATE bankers SET ${updateClause} WHERE id = ${id}`;
-      dbConnect.query(sql, (err, result) => {
+      req.dbQuery(sql, (err, result) => {
         if (err) {
           console.log("changeBankersStatus and updatecalss error:");
           return res.status(500).send("Error in Updating the Lender Status");
@@ -167,7 +167,7 @@ const changeBankersStatus = asyncHandler((req, res) => {
 });
 // const deleteBanker = asyncHandler((req, res) => {
 //   const sql = `DELETE FROM bankers WHERE id = ${req.params.id}`;
-//   dbConnect.query(sql, (err, result) => {
+//   req.dbQuery(sql, (err, result) => {
 //     if (err) {
 //       console.log("deleteBanker error:");
 //     }
@@ -176,7 +176,7 @@ const changeBankersStatus = asyncHandler((req, res) => {
 // });
 const deleteBanker = asyncHandler((req, res) => {
   const sql = `DELETE FROM bankers WHERE bankerId = '${req.params.id}'`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("deleteBanker error:", err);
       return res.status(500).send("Error In Deleting the Lender");

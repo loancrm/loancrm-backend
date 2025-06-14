@@ -22,7 +22,7 @@ const getLeadsCount = asyncHandler(async (req, res) => {
   let sql = "SELECT count(*) as leadsCount FROM leads";
   const filtersQuery = handleGlobalFilters(req.query, true);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getLeadsCount error in controller");
       return res.status(500).send("Error in Fetching the Leads Count");
@@ -38,7 +38,7 @@ const getLeads = asyncHandler(async (req, res) => {
   queryParams["sort"] = "createdOn";
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getLeads Error in controller");
       return res.status(500).send("Error in Fetching the Leads");
@@ -69,7 +69,7 @@ const getLeads = asyncHandler(async (req, res) => {
 
 //   const leadSql = `SELECT * FROM leads${leadFilterQuery}`;
 
-//   dbConnect.query(leadSql, (leadErr, leadResult) => {
+//   req.dbQuery(leadSql, (leadErr, leadResult) => {
 //     if (leadErr) {
 //       console.error("Leads query error:", leadErr);
 //       return res.status(500).send("Error fetching leads");
@@ -90,7 +90,7 @@ const getLeads = asyncHandler(async (req, res) => {
 //       docSql += docExtraFilters.replace(/^WHERE/i, ' AND');
 //     }
 //     console.log(docSql)
-//     dbConnect.query(docSql, (docErr, docResult) => {
+//     req.dbQuery(docSql, (docErr, docResult) => {
 //       if (docErr) {
 //         console.error("leadDocuments query error:", docErr);
 //         return res.status(500).send("Error fetching document data");
@@ -135,7 +135,7 @@ const getFiles = asyncHandler(async (req, res) => {
     docSql += ` ${docFilterQuery}`;
   }
 
-  dbConnect.query(docSql, (docErr, docResult) => {
+  req.dbQuery(docSql, (docErr, docResult) => {
     if (docErr) {
       console.error("leadDocuments query error:", docErr);
       return res.status(500).send("Error fetching document data");
@@ -170,7 +170,7 @@ const getFiles = asyncHandler(async (req, res) => {
     } else {
       fullLeadQuery += ` WHERE ${leadIdFilter}`;
     }
-    dbConnect.query(fullLeadQuery, (leadErr, leadResult) => {
+    req.dbQuery(fullLeadQuery, (leadErr, leadResult) => {
       if (leadErr) {
         console.error("Leads query error:", leadErr);
         return res.status(500).send("Error fetching leads");
@@ -208,7 +208,7 @@ const getFilesCount = asyncHandler(async (req, res) => {
 
   const leadSql = `SELECT id FROM leads ${leadFilterQuery}`;
 
-  dbConnect.query(leadSql, (leadErr, leadResult) => {
+  req.dbQuery(leadSql, (leadErr, leadResult) => {
     if (leadErr) {
       console.error("Leads query error:", leadErr);
       return res.status(500).send("Error fetching leads");
@@ -227,7 +227,7 @@ const getFilesCount = asyncHandler(async (req, res) => {
       docSql += docExtraFilters.replace(/^WHERE/i, ' AND');
     }
 
-    dbConnect.query(docSql, (docErr, docResult) => {
+    req.dbQuery(docSql, (docErr, docResult) => {
       if (docErr) {
         console.error("leadDocuments count query error:", docErr);
         return res.status(500).send("Error fetching document count");
@@ -242,7 +242,7 @@ const getLeadSources = asyncHandler(async (req, res) => {
   let sql = "SELECT * FROM leadsources";
   const filtersQuery = handleGlobalFilters(req.query);
   sql += filtersQuery;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getLeadUSoucres error in controller");
       return res.status(500).send("Error in Fetching the Lead Sources");
@@ -254,7 +254,7 @@ const getLeadSources = asyncHandler(async (req, res) => {
 
 const getLeadById = asyncHandler((req, res) => {
   const sql = `SELECT * FROM leads WHERE id = ${req.params.id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getLeadById error in controller");
       return res.status(500).send("Error in Fetching the Lead Details");
@@ -266,7 +266,7 @@ const getLeadById = asyncHandler((req, res) => {
 
 const getLeadDocumentsById = asyncHandler((req, res) => {
   const sql = `SELECT * FROM leaddocuments WHERE leadId = ${req.params.leadId}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getLeadDocumentsById Error in controller");
       return res.status(500).send("Error in Fetching the Lead Documents");
@@ -281,7 +281,7 @@ const addDocumentData = asyncHandler((req, res) => {
   req.body["lastUpdatedBy"] = req.user.name;
   const updateClause = updateClauseHandler(req.body);
   const sql = `UPDATE leaddocuments SET ${updateClause} WHERE leadId = ${id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("addDocumentData error in controller");
       return res.status(500).send("Error in Adding the Documents");
@@ -297,7 +297,7 @@ const addDocumentData = asyncHandler((req, res) => {
 //   const updateClause = updateClauseHandler(req.body);
 //   const sql = `UPDATE leaddocuments SET ${updateClause} WHERE leadId = ${id}`;
 
-//   dbConnect.query(sql, (err, result) => {
+//   req.dbQuery(sql, (err, result) => {
 //     if (err) {
 //       console.log("addDocumentData error in controller");
 //       return res.status(500).send("Error in Adding the Documents");
@@ -322,7 +322,7 @@ const addDscrValuesData = asyncHandler((req, res) => {
   req.body["lastUpdatedBy"] = req.user.name;
   const updateClause = updateClauseHandler(req.body);
   const sql = `UPDATE dscr_values SET ${updateClause} WHERE leadId = ${id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("addDscrValuesData error in controller");
     }
@@ -332,7 +332,7 @@ const addDscrValuesData = asyncHandler((req, res) => {
 
 const getDscrValuesById = asyncHandler((req, res) => {
   const sql = `SELECT * FROM dscr_values WHERE leadId = ${req.params.leadId}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("getDscrValuesById Error in controller");
     }
@@ -359,7 +359,7 @@ const calculateGstProgram = asyncHandler((req, res) => {
     SET ${extendedUpdateClause}
     WHERE leadId = ${req.params.leadId}
   `;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error updating data:", err);
       return res.status(500).json({ error: "Internal Server Error" });
@@ -397,7 +397,7 @@ const calculateBalanceSheet = asyncHandler((req, res) => {
     SET ${extendedUpdateClause}
     WHERE leadId = ${req.params.leadId}
   `;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error updating data:", err);
       return res.status(500).json({ error: "Internal Server Error" });
@@ -441,7 +441,7 @@ const calculateDscrRatio = asyncHandler((req, res) => {
     SET ${extendedUpdateClause}
     WHERE leadId = ${req.params.leadId}
   `;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error updating data:", err);
       return res.status(500).json({ error: "Internal Server Error" });
@@ -472,7 +472,7 @@ const calculateBTOProgram = asyncHandler((req, res) => {
     SET ${extendedUpdateClause}
     WHERE leadId = ${req.params.leadId}
   `;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error updating data:", err);
       return res.status(500).json({ error: "Internal Server Error" });
@@ -489,7 +489,7 @@ const searchLeads = asyncHandler(async (req, res) => {
   const queryParams = req.query;
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
-  dbConnect.query(sql, async (err, leadsResult) => {
+  req.dbQuery(sql, async (err, leadsResult) => {
     if (err) {
       console.log("getLeads Error in controller");
       return res.status(500).send({ message: "Internal Server Error" });
@@ -499,7 +499,7 @@ const searchLeads = asyncHandler(async (req, res) => {
       return res.status(404).send("No Leads Found.");
     }
     const statusSql = "SELECT id, displayName FROM leadstatus";
-    dbConnect.query(statusSql, async (err, statusResult) => {
+    req.dbQuery(statusSql, async (err, statusResult) => {
       if (err) {
         console.log("Error fetching lead statuses");
         return res.status(500).send({ message: "Internal Server Error" });
@@ -557,7 +557,7 @@ async function fetchTeamData() {
     FROM users;
   `;
   return new Promise((resolve, reject) => {
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         reject(err);
         return;
@@ -585,7 +585,7 @@ const createLead = asyncHandler(async (req, res) => {
     return createNewLead(req, res);
   }
   const checkPhoneQuery = `SELECT * FROM leads WHERE primaryPhone = ?`;
-  dbConnect.query(checkPhoneQuery, [phoneNumber], async (err, result) => {
+  req.dbQuery(checkPhoneQuery, [phoneNumber], async (err, result) => {
     if (err) {
       console.error("Error checking phone number:", err);
       return res.status(500).send("Error in checking phone number");
@@ -619,7 +619,7 @@ function createNewLead(req, res) {
   req.body["lastUpdatedBy"] = req.user.name;
   const createClause = createClauseHandler(req.body);
   const sql = `INSERT INTO leads (${createClause[0]}) VALUES (${createClause[1]})`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error inserting data into leads table:", err);
       res.status(500).send("Internal server error");
@@ -635,7 +635,7 @@ const createLeadFromCallback = asyncHandler(async (req, res) => {
     return createNewLeadFromCallback(req, res);
   }
   const checkPhoneQuery = `SELECT * FROM leads WHERE primaryPhone = ?`;
-  dbConnect.query(checkPhoneQuery, [phoneNumber], async (err, result) => {
+  req.dbQuery(checkPhoneQuery, [phoneNumber], async (err, result) => {
     if (err) {
       console.error("Error checking phone number:", err);
       return res.status(500).send("Error in Checking the Phone Number");
@@ -669,7 +669,7 @@ function createNewLeadFromCallback(req, res) {
   req.body["lastUpdatedBy"] = req.user.name;
   const createClause = createClauseHandler(req.body);
   const sql = `INSERT INTO leads (${createClause[0]}) VALUES (${createClause[1]})`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.error("Error inserting data into leads table:", err);
       res.status(500).send("Internal server error");
@@ -685,7 +685,7 @@ function updateNewLead(req, res) {
   req.body["lastUpdatedBy"] = req.user.name;
   const updateClause = updateClauseHandler(req.body);
   const updateSql = `UPDATE leads SET ${updateClause} WHERE id = ?`;
-  dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
+  req.dbQuery(updateSql, [id], (updateErr, updateResult) => {
     if (updateErr) {
       console.error("updateLead error in controller:", updateErr);
       return res.status(500).send("Error in Updating the Lead");
@@ -705,7 +705,7 @@ const updateLead = asyncHandler(async (req, res) => {
   const { primaryPhone } = req.body;
   const id = req.params.id;
   const checkPhoneQuery = `SELECT * FROM leads WHERE primaryPhone = ? AND id != ?`;
-  dbConnect.query(checkPhoneQuery, [primaryPhone, id], async (err, result) => {
+  req.dbQuery(checkPhoneQuery, [primaryPhone, id], async (err, result) => {
     if (err) {
       console.error("Error checking phone number:", err);
       return res.status(500).send("Error in checking the phone number");
@@ -729,7 +729,7 @@ const updateLead = asyncHandler(async (req, res) => {
 });
 // const deleteLead = asyncHandler((req, res) => {
 //   const sql = `DELETE FROM leads WHERE id = ${req.params.id}`;
-//   dbConnect.query(sql, (err, result) => {
+//   req.dbQuery(sql, (err, result) => {
 //     if (err) {
 //       console.log("deleteLead error in controller");
 //     }
@@ -738,7 +738,7 @@ const updateLead = asyncHandler(async (req, res) => {
 // });
 const deleteLead = asyncHandler((req, res) => {
   const sql = `DELETE FROM leads WHERE id = ${req.params.id}`;
-  dbConnect.query(sql, (err, result) => {
+  req.dbQuery(sql, (err, result) => {
     if (err) {
       console.log("deleteLead error:", err);
       return res.status(500).send("Error In Deleting the Lead");
@@ -751,7 +751,7 @@ const changeLeadStatus = asyncHandler((req, res) => {
   const id = req.params.leadId;
   const statusId = req.params.statusId;
   const createSql = `SELECT * FROM leads WHERE id = ${id}`;
-  dbConnect.query(createSql, (err, result) => {
+  req.dbQuery(createSql, (err, result) => {
     if (err) {
       console.log("changeLeadStatus error in controller");
       return res.status(500).send("Error in Checking The Lead");
@@ -763,7 +763,7 @@ const changeLeadStatus = asyncHandler((req, res) => {
       };
       const updateClause = updateClauseHandler(statusData);
       const sql = `UPDATE leads SET ${updateClause} WHERE id = ${id}`;
-      dbConnect.query(sql, (err, result) => {
+      req.dbQuery(sql, (err, result) => {
         if (err) {
           console.log("changeLeadStatus error in controller");
           return res.status(500).send("Error in Updating The Lead Status");
@@ -779,7 +779,7 @@ const changeLeadStatus = asyncHandler((req, res) => {
 const getCreditSummary = asyncHandler(async (req, res) => {
   const { id } = req.params;
   let sql = `SELECT creditSummary FROM dscr_values WHERE leadId = ?`;
-  dbConnect.query(sql, [id], (err, result) => {
+  req.dbQuery(sql, [id], (err, result) => {
     if (err) {
       console.error("getCreditSummary error:", err);
       return res.status(500).send("Error retrieving credit summary");
@@ -802,7 +802,7 @@ const getCreditSummary = asyncHandler(async (req, res) => {
 //   const loginsQuery = `SELECT * FROM logins WHERE leadId = ?`;
 
 //   // Start by getting lead details
-//   dbConnect.query(leadQuery, [leadId], (err, leadResults) => {
+//   req.dbQuery(leadQuery, [leadId], (err, leadResults) => {
 //     if (err) return res.status(500).json({ error: 'Error fetching lead details' });
 
 //     if (leadResults.length === 0) return res.status(404).json({ message: 'Lead not found' });
@@ -810,15 +810,15 @@ const getCreditSummary = asyncHandler(async (req, res) => {
 //     const leadData = leadResults[0]; // Assuming one result for leadId
 
 //     // Now get the documents associated with the lead
-//     dbConnect.query(documentsQuery, [leadId], (err, documentResults) => {
+//     req.dbQuery(documentsQuery, [leadId], (err, documentResults) => {
 //       if (err) return res.status(500).json({ error: 'Error fetching document details' });
 
 //       // Now get credit details
-//       dbConnect.query(crditsQuery, [leadId], (err, creditsResults) => {
+//       req.dbQuery(crditsQuery, [leadId], (err, creditsResults) => {
 //         if (err) return res.status(500).json({ error: 'Error fetching credit details' });
 
 //         // Now get login details
-//         dbConnect.query(loginsQuery, [leadId], (err, loginResults) => {
+//         req.dbQuery(loginsQuery, [leadId], (err, loginResults) => {
 //           if (err) return res.status(500).json({ error: 'Error fetching login details' });
 
 //           // If no login data found, set it as an empty array
@@ -935,7 +935,7 @@ const getInhouseRejectedLeads = asyncHandler(async (req, res) => {
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
 
-  dbConnect.query(sql, async (err, leads) => {
+  req.dbQuery(sql, async (err, leads) => {
     if (err) {
       console.log("Error fetching leads");
       return res.status(500).send("Error in Fetching the Leads");
@@ -951,7 +951,7 @@ const getInhouseRejectedLeads = asyncHandler(async (req, res) => {
       FROM dscr_values 
       WHERE leadId IN (?)
     `;
-    dbConnect.query(creditSql, [leadIds], (err, creditRows) => {
+    req.dbQuery(creditSql, [leadIds], (err, creditRows) => {
       if (err) {
         console.log("Error fetching credit sheet summaries");
         return res.status(500).send("Error fetching credit summary data");

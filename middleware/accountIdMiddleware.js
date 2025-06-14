@@ -6,10 +6,10 @@
 //         return res.status(403).send("Access denied. No account ID found.");
 //     }
 
-//     const originalQuery = dbConnect.query.bind(dbConnect);
+//     const originalQuery = req.dbQuery.bind(dbConnect);
 //     const accountId = user.accountId;
 
-//     dbConnect.query = (sql, params, callback) => {
+//     req.dbQuery = (sql, params, callback) => {
 //         if (typeof params === "function") {
 //             callback = params;
 //             params = [];
@@ -83,118 +83,201 @@
 
 const dbConnect = require("../config/dbConnection");
 
+
+
+// const accountIdMiddleware = (req, res, next) => {
+//     // console.log("req.skipAccountIdMiddleware,==========================================", req.skipAccountIdMiddleware)
+//     if (req.skipAccountIdMiddleware) {
+//         console.log("⛔ Skipping accountIdMiddleware for this route");
+//         return next(); // ✅ SKIP!
+//     }
+//     const user = req.user;
+//     if (!user || !user.accountId) {
+//         return res.status(403).send("Access denied. No account ID found.");
+//     }
+
+//     const originalQuery = dbConnect.query.bind(dbConnect);
+//     const accountId = user.accountId;
+
+//     dbConnect.query = (sql, params, callback) => {
+//         if (typeof params === "function") {
+//             callback = params;
+//             params = [];
+//         }
+//         params = params || [];
+
+//         const trimmedSql = sql.trim().toLowerCase();
+
+//         // 1. SELECT - add accountId filter
+//         if (trimmedSql.startsWith("select")) {
+//             // Skip if already has accountId
+//             if (sql.toLowerCase().includes("accountid =")) {
+//                 return originalQuery(sql, params, callback);
+//             }
+
+//             // Remove trailing semicolon
+//             sql = sql.trim().replace(/;$/, "");
+
+//             // Extract ORDER BY and LIMIT/OFFSET
+//             let orderBy = "";
+//             let limitOffset = "";
+
+//             const orderByMatch = sql.match(/\sorder\s+by\s[\w`,.\s]+$/i);
+//             if (orderByMatch) {
+//                 orderBy = orderByMatch[0];
+//                 sql = sql.slice(0, orderByMatch.index).trim();
+//             }
+
+//             const limitOffsetMatch = sql.match(/\slimit\s+\d+(\s+offset\s+\d+)?$/i);
+//             if (limitOffsetMatch) {
+//                 limitOffset = limitOffsetMatch[0];
+//                 sql = sql.slice(0, limitOffsetMatch.index).trim();
+//             }
+
+//             // Check if FROM uses direct table
+//             const fromMatch = sql.match(/\bfrom\s+([^\s(]+)/i);
+//             if (!fromMatch) return originalQuery(sql, params, callback);
+
+//             const tableName = fromMatch[1].toLowerCase();
+//             const safeTables = ["userrole", "leadsources","leadstatus"];
+
+//             if (safeTables.includes(tableName)) {
+//                 return originalQuery(sql, params, callback);
+//             }
+
+//             // Add accountId filter
+//             if (/\swhere\s/i.test(sql)) {
+//                 sql += " AND accountId = ?";
+//             } else {
+//                 sql += " WHERE accountId = ?";
+//             }
+
+//             const modifiedSql = sql + orderBy + limitOffset;
+//             const finalParams = [...params, accountId];
+
+//             console.log("Modified SELECT SQL:", modifiedSql);
+//             console.log("finalParams", finalParams)
+//             return originalQuery(modifiedSql, finalParams, callback);
+//         }
+
+//         // 2. INSERT - add accountId column and value
+//         if (trimmedSql.startsWith("insert into")) {
+//             const insertMatch = sql.match(/^insert\s+into\s+([^\s(]+)\s*\(([^)]+)\)\s+values\s*\(([^)]+)\)/i);
+//             if (!insertMatch) return originalQuery(sql, params, callback);
+
+//             const tableName = insertMatch[1].toLowerCase();
+//             // const safeTables = ["userrole", "leadsources"];
+
+//             // if (!safeTables.includes(tableName)) {
+//             //     return originalQuery(sql, params, callback);
+//             // }
+
+//             // Extract existing columns and placeholders
+//             const columns = insertMatch[2].split(',').map(c => c.trim());
+//             const placeholders = insertMatch[3].split(',').map(p => p.trim());
+
+//             // If accountId already included, skip
+//             if (columns.includes("accountId")) {
+//                 return originalQuery(sql, params, callback);
+//             }
+
+//             // Add accountId
+//             columns.push("accountId");
+//             placeholders.push("?");
+
+//             const modifiedSql = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders.join(", ")})`;
+//             const finalParams = [...params, accountId];
+
+//             console.log("Modified INSERT SQL:", modifiedSql);
+//             return originalQuery(modifiedSql, finalParams, callback);
+//         }
+
+//         // 3. Default - run original
+//         return originalQuery(sql, params, callback);
+//     };
+
+//     next();
+// };
 const accountIdMiddleware = (req, res, next) => {
-    // console.log("req.skipAccountIdMiddleware,==========================================", req.skipAccountIdMiddleware)
-    if (req.skipAccountIdMiddleware) {
-        console.log("⛔ Skipping accountIdMiddleware for this route");
-        return next(); // ✅ SKIP!
+  if (req.skipAccountIdMiddleware) {
+    console.log("⛔ Skipping accountIdMiddleware for this route");
+    return next();
+  }
+
+  const user = req.user;
+  if (!user || !user.accountId) {
+    return res.status(403).send("Access denied. No account ID found.");
+  }
+
+  const originalQuery = dbConnect.query.bind(dbConnect);
+  const accountId = user.accountId;
+
+  req.dbQuery = (sql, params, callback) => {
+    if (typeof params === "function") {
+      callback = params;
+      params = [];
     }
-    const user = req.user;
-    if (!user || !user.accountId) {
-        return res.status(403).send("Access denied. No account ID found.");
-    }
+    params = params || [];
 
-    const originalQuery = dbConnect.query.bind(dbConnect);
-    const accountId = user.accountId;
+    sql = sql.trim().replace(/;$/, ""); // ✅ Always clean semicolon first
+    const trimmedSql = sql.toLowerCase();
 
-    dbConnect.query = (sql, params, callback) => {
-        if (typeof params === "function") {
-            callback = params;
-            params = [];
-        }
-        params = params || [];
-
-        const trimmedSql = sql.trim().toLowerCase();
-
-        // 1. SELECT - add accountId filter
-        if (trimmedSql.startsWith("select")) {
-            // Skip if already has accountId
-            if (sql.toLowerCase().includes("accountid =")) {
-                return originalQuery(sql, params, callback);
-            }
-
-            // Remove trailing semicolon
-            sql = sql.trim().replace(/;$/, "");
-
-            // Extract ORDER BY and LIMIT/OFFSET
-            let orderBy = "";
-            let limitOffset = "";
-
-            const orderByMatch = sql.match(/\sorder\s+by\s[\w`,.\s]+$/i);
-            if (orderByMatch) {
-                orderBy = orderByMatch[0];
-                sql = sql.slice(0, orderByMatch.index).trim();
-            }
-
-            const limitOffsetMatch = sql.match(/\slimit\s+\d+(\s+offset\s+\d+)?$/i);
-            if (limitOffsetMatch) {
-                limitOffset = limitOffsetMatch[0];
-                sql = sql.slice(0, limitOffsetMatch.index).trim();
-            }
-
-            // Check if FROM uses direct table
-            const fromMatch = sql.match(/\bfrom\s+([^\s(]+)/i);
-            if (!fromMatch) return originalQuery(sql, params, callback);
-
-            const tableName = fromMatch[1].toLowerCase();
-            const safeTables = ["userrole", "leadsources","leadstatus"];
-
-            if (safeTables.includes(tableName)) {
-                return originalQuery(sql, params, callback);
-            }
-
-            // Add accountId filter
-            if (/\swhere\s/i.test(sql)) {
-                sql += " AND accountId = ?";
-            } else {
-                sql += " WHERE accountId = ?";
-            }
-
-            const modifiedSql = sql + orderBy + limitOffset;
-            const finalParams = [...params, accountId];
-
-            console.log("Modified SELECT SQL:", modifiedSql);
-            console.log("finalParams", finalParams)
-            return originalQuery(modifiedSql, finalParams, callback);
-        }
-
-        // 2. INSERT - add accountId column and value
-        if (trimmedSql.startsWith("insert into")) {
-            const insertMatch = sql.match(/^insert\s+into\s+([^\s(]+)\s*\(([^)]+)\)\s+values\s*\(([^)]+)\)/i);
-            if (!insertMatch) return originalQuery(sql, params, callback);
-
-            const tableName = insertMatch[1].toLowerCase();
-            // const safeTables = ["userrole", "leadsources"];
-
-            // if (!safeTables.includes(tableName)) {
-            //     return originalQuery(sql, params, callback);
-            // }
-
-            // Extract existing columns and placeholders
-            const columns = insertMatch[2].split(',').map(c => c.trim());
-            const placeholders = insertMatch[3].split(',').map(p => p.trim());
-
-            // If accountId already included, skip
-            if (columns.includes("accountId")) {
-                return originalQuery(sql, params, callback);
-            }
-
-            // Add accountId
-            columns.push("accountId");
-            placeholders.push("?");
-
-            const modifiedSql = `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders.join(", ")})`;
-            const finalParams = [...params, accountId];
-
-            console.log("Modified INSERT SQL:", modifiedSql);
-            return originalQuery(modifiedSql, finalParams, callback);
-        }
-
-        // 3. Default - run original
+    // SELECT
+    if (trimmedSql.startsWith("select")) {
+      if (trimmedSql.includes("accountid =")) {
         return originalQuery(sql, params, callback);
-    };
+      }
 
-    next();
+      let orderBy = "";
+      let limitOffset = "";
+
+      const orderByMatch = sql.match(/\sorder\s+by\s[\w`,.\s]+$/i);
+      if (orderByMatch) {
+        orderBy = orderByMatch[0];
+        sql = sql.slice(0, orderByMatch.index).trim();
+      }
+
+      const limitOffsetMatch = sql.match(/\slimit\s+\d+(\s+offset\s+\d+)?$/i);
+      if (limitOffsetMatch) {
+        limitOffset = limitOffsetMatch[0];
+        sql = sql.slice(0, limitOffsetMatch.index).trim();
+      }
+
+      const fromMatch = sql.match(/\bfrom\s+([^\s(]+)/i);
+      const safeTables = ["userrole", "leadsources", "leadstatus"];
+      if (!fromMatch || safeTables.includes(fromMatch[1].toLowerCase())) {
+        return originalQuery(sql, params, callback);
+      }
+
+      sql += trimmedSql.includes("where") ? " AND accountId = ?" : " WHERE accountId = ?";
+      const finalSql = sql + orderBy + limitOffset;
+
+      return originalQuery(finalSql, [...params, accountId], callback);
+    }
+
+    // INSERT
+    if (trimmedSql.startsWith("insert into")) {
+      const insertMatch = sql.match(/^insert\s+into\s+([^\s(]+)\s*\(([^)]+)\)\s+values\s*\(([^)]+)\)/i);
+      if (!insertMatch) return originalQuery(sql, params, callback);
+
+      const columns = insertMatch[2].split(',').map(c => c.trim());
+      const placeholders = insertMatch[3].split(',').map(p => p.trim());
+
+      if (!columns.includes("accountId")) {
+        columns.push("accountId");
+        placeholders.push("?");
+        sql = `INSERT INTO ${insertMatch[1]} (${columns.join(", ")}) VALUES (${placeholders.join(", ")})`;
+        params.push(accountId);
+      }
+
+      return originalQuery(sql, params, callback);
+    }
+
+    // Default
+    return originalQuery(sql, params, callback);
+  };
+
+  next();
 };
 
 module.exports = accountIdMiddleware;

@@ -57,7 +57,7 @@ const exportLeads = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'leads1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -102,7 +102,7 @@ const exportLeads = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -144,7 +144,7 @@ const exportCallbacks = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'callbacks1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -190,7 +190,7 @@ const exportCallbacks = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -235,7 +235,7 @@ const exportFilesInProcess = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'FilesInProcess1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -280,7 +280,7 @@ const exportFilesInProcess = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -325,7 +325,7 @@ const exportApprovalLeads = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'ApprovalFiles1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -369,7 +369,7 @@ const exportApprovalLeads = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -415,7 +415,7 @@ const exportDisbursalLeads = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'DisbursalFiles1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -458,7 +458,7 @@ const exportDisbursalLeads = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -505,7 +505,7 @@ const exportBankRejectedLeads = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'BankRejectedFiles1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -549,7 +549,7 @@ const exportBankRejectedLeads = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -594,7 +594,7 @@ const exportCNILeads = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'CNIFiles1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -638,7 +638,7 @@ const exportCNILeads = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -688,7 +688,7 @@ const exportSanctionDetails = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'sanctionDetails1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -730,7 +730,7 @@ const exportSanctionDetails = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -781,7 +781,7 @@ const exportDisbursalDetails = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'disbursalDetails1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -796,7 +796,7 @@ const exportDisbursalDetails = asyncHandler(async (req, res) => {
                 let contactSql = `SELECT primaryPhone FROM leads WHERE id = ?`;
     
                 const contactResult = await new Promise((resolve, reject) => {
-                    dbConnect.query(contactSql, [leadId], (contactErr, contactRes) => {
+                    req.dbQuery(contactSql, [leadId], (contactErr, contactRes) => {
                         if (contactErr) reject(contactErr);
                         else resolve(contactRes);
                     });
@@ -840,7 +840,7 @@ const exportDisbursalDetails = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -881,7 +881,7 @@ const exportloginsDoneDetails = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'loginsDoneDetails1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -892,7 +892,7 @@ const exportloginsDoneDetails = asyncHandler(async (req, res) => {
                 let leadId = result[i].leadId;
                 let contactSql = `SELECT primaryPhone FROM leads WHERE id = ?`;
                 const contactResult = await new Promise((resolve, reject) => {
-                    dbConnect.query(contactSql, [leadId], (contactErr, contactRes) => {
+                    req.dbQuery(contactSql, [leadId], (contactErr, contactRes) => {
                         if (contactErr) reject(contactErr);
                         else resolve(contactRes);
                     });
@@ -935,7 +935,7 @@ const exportloginsDoneDetails = asyncHandler(async (req, res) => {
                     const createdBy = req.user.name;
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
-                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                    req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
                             res.status(500).json({ error: "Internal server error" });
@@ -976,7 +976,7 @@ const exportCNILeadDetails = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'CNIDetails1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sqlLogins, async (err, loginsResult) => {
+    req.dbQuery(sqlLogins, async (err, loginsResult) => {
         if (err) {
             console.error("Error exporting leads from logins: ", err);
             res.status(500).json({ error: "Internal server error" });
@@ -990,7 +990,7 @@ const exportCNILeadDetails = asyncHandler(async (req, res) => {
         queryParams["sort"] = "createdOn";
         const filtersQuery = handleGlobalFilters(queryParams);
         sqlLeads += filtersQuery;
-        dbConnect.query(sqlLeads, async (leadsErr, leadsResult) => {
+        req.dbQuery(sqlLeads, async (leadsErr, leadsResult) => {
             if (leadsErr) {
                 console.error("Error exporting leads from leads table: ", leadsErr);
                 res.status(500).json({ error: "Internal server error" });
@@ -1050,7 +1050,7 @@ const exportCNILeadDetails = asyncHandler(async (req, res) => {
                         const createdBy = req.user.name;
                         const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                         const values = [reportId, type, fileUrlArray, createdBy];
-                        dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                        req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                             if (insertErr) {
                                 console.error("Error inserting report URL into the database:", insertErr);
                                 res.status(500).json({ error: "Internal server error" });
@@ -1088,7 +1088,7 @@ const getReports = asyncHandler(async (req, res) => {
     queryParams["sort"] = "createdOn";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("getReports Error in controller");
         }
@@ -1100,7 +1100,7 @@ const getReportsCount = asyncHandler(async (req, res) => {
     let sql = "SELECT count(*) as reportCount FROM reports";
     const filtersQuery = handleGlobalFilters(req.query, true);
     sql += filtersQuery;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
         if (err) {
             console.log("Error in getUsersCount:", err);
             res.status(500).send("Internal Server Error");
@@ -1122,7 +1122,7 @@ const exportloginFiles = asyncHandler(async (req, res) => {
         const leadsSql = `SELECT id FROM leads WHERE sourcedBy IN (${sourcedByArray})`;
         console.log(leadsSql);
         const [leadsErr, leadsResult] = await new Promise((resolve) => {
-            dbConnect.query(leadsSql, (err, result) => resolve([err, result]));
+            req.dbQuery(leadsSql, (err, result) => resolve([err, result]));
         });
         if (leadsErr) {
             console.error("Error fetching leads:", leadsErr);
@@ -1155,7 +1155,7 @@ const exportloginFiles = asyncHandler(async (req, res) => {
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'loginFiles1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
-    dbConnect.query(sql, async (err, result) => {
+    req.dbQuery(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting leads:", err);
             res.status(500).json({ error: "Internal server error" });
@@ -1163,7 +1163,7 @@ const exportloginFiles = asyncHandler(async (req, res) => {
         }
         const leadIds = result.map((login) => login.leadId);
         const leadsSql = `SELECT id, sourcedBy FROM leads WHERE id IN (${leadIds.map((id) => dbConnect.escape(id)).join(',')})`;
-        dbConnect.query(leadsSql, async (leadsErr, leadsResult) => {
+        req.dbQuery(leadsSql, async (leadsErr, leadsResult) => {
             if (leadsErr) {
                 console.error("Error fetching sourcedBy values:", leadsErr);
                 res.status(500).json({ error: "Internal server error" });
@@ -1184,7 +1184,7 @@ const exportloginFiles = asyncHandler(async (req, res) => {
                     let leadId = result[i].leadId;
                     let contactSql = `SELECT primaryPhone FROM leads WHERE id = ?`;
                     const contactResult = await new Promise((resolve, reject) => {
-                        dbConnect.query(contactSql, [leadId], (contactErr, contactRes) => {
+                        req.dbQuery(contactSql, [leadId], (contactErr, contactRes) => {
                             if (contactErr) reject(contactErr);
                             else resolve(contactRes);
                         });
@@ -1242,7 +1242,7 @@ const exportloginFiles = asyncHandler(async (req, res) => {
                         const createdBy = req.user.name;
                         const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                         const values = [reportId, type, fileUrlArray, createdBy];
-                        dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                        req.dbQuery(insertSql, values, (insertErr, insertResult) => {
                             if (insertErr) {
                                 console.error("Error inserting report URL into the database:", insertErr);
                                 res.status(500).json({ error: "Internal server error" });
