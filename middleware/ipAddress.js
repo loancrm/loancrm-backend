@@ -5,7 +5,7 @@ function isUserLoggedIn(req) {
     return req.body.username == null;
 }
 let allowedIPs = [];
-function fetchAllowedIPs() {
+function fetchAllowedIPs(req) {
     return new Promise((resolve, reject) => {
         req.dbQuery("SELECT ipAddress FROM ipaddresses", (err, results) => {
             if (err) {
@@ -55,7 +55,7 @@ function fetchAllowedIPs() {
 
 async function ipWhitelist(req, res, next) {
     try {
-        const allowedIPs = await fetchAllowedIPs(); // should return an array like ["123.45", "127.0", "0.0.0.0"]
+        const allowedIPs = await fetchAllowedIPs(req); // should return an array like ["123.45", "127.0", "0.0.0.0"]
         // console.log(allowedIPs)
         // If '0.0.0.0' is present, skip IP restriction
         if (allowedIPs.includes("0.0")) {

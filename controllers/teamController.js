@@ -17,7 +17,7 @@ const createUsers = asyncHandler(async (req, res) => {
   req.body["lastUserInternalStatus"] = 1;
   req.body["password"] = encryptedPassword;
   const checkIfExistsQuery = `SELECT * FROM users WHERE (email = ? OR phone = ?)`;
-  req.dbQuery(checkIfExistsQuery, [req.body.email, req.body.phone], (err, results) => {
+  dbConnect.query(checkIfExistsQuery, [req.body.email, req.body.phone], (err, results) => {
     if (err) {
       console.error("Error checking if user exists:", err);
       return res.status(500).send("Error in Checking Email or Phone Number");
@@ -27,7 +27,7 @@ const createUsers = asyncHandler(async (req, res) => {
     }
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO users (${createClause[0]}) VALUES (${createClause[1]})`;
-    req.dbQuery(sql, (err, result) => {
+    dbConnect.query(sql, (err, result) => {
       if (err) {
         console.error("Error creating user:", err);
         return res.status(500).send("Error in Creating User");
@@ -42,7 +42,7 @@ const createUsers = asyncHandler(async (req, res) => {
       const rbacValue = rbacValues[req.body.userType];
       if (rbacValue) {
         const updateRbacQuery = `UPDATE users SET rbac = ? WHERE id = ?`;
-        req.dbQuery(updateRbacQuery, [rbacValue, result.insertId], (err, updateResult) => {
+        dbConnect.query(updateRbacQuery, [rbacValue, result.insertId], (err, updateResult) => {
           if (err) {
             console.error("Error updating RBAC:", err);
             return res.status(500).send("Error in Updating RBAC");
@@ -59,11 +59,11 @@ const createUsers = asyncHandler(async (req, res) => {
 
 const updateUsers = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  let phoneNumber = req.body.phone.toString();
-  let encryptedPassword = await bcrypt.hash(phoneNumber, 12);
-  req.body["password"] = encryptedPassword;
+  // let phoneNumber = req.body.phone.toString();
+  // let encryptedPassword = await bcrypt.hash(phoneNumber, 12);
+  // req.body["password"] = encryptedPassword;
   const checkIfExistsQuery = `SELECT * FROM users WHERE (email = ? OR phone = ?) AND id != ?`;
-  req.dbQuery(checkIfExistsQuery, [req.body.email, req.body.phone, req.params.id], (err, results) => {
+  dbConnect.query(checkIfExistsQuery, [req.body.email, req.body.phone, req.params.id], (err, results) => {
     if (err) {
       console.error("Error checking if user exists:", err);
       return res.status(500).send("Error in Checking Eamil Or Phone Number");
@@ -74,7 +74,7 @@ const updateUsers = asyncHandler(async (req, res) => {
     }
     const updateClause = updateClauseHandler(req.body);
     const sql = `UPDATE users SET ${updateClause} WHERE id = ${id}`;
-    req.dbQuery(sql, (err, result) => {
+    dbConnect.query(sql, (err, result) => {
       if (err) {
         console.log("updateUsers error in controller");
         return res.status(500).send("Error in Updating User");
@@ -89,7 +89,7 @@ const updateUsers = asyncHandler(async (req, res) => {
       const rbacValue = rbacValues[req.body.userType];
       if (rbacValue) {
         const updateRbacQuery = `UPDATE users SET rbac = ? WHERE id = ?`;
-        req.dbQuery(updateRbacQuery, [rbacValue, id], (err, updateResult) => {
+        dbConnect.query(updateRbacQuery, [rbacValue, id], (err, updateResult) => {
           if (err) {
             console.error("Error updating RBAC:", err);
             return res.status(500).send("Error in Updating RBAC");
