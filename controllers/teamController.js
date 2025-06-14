@@ -27,7 +27,7 @@ const createUsers = asyncHandler(async (req, res) => {
     }
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO users (${createClause[0]}) VALUES (${createClause[1]})`;
-    dbConnect.query(sql, (err, result) => {
+    req.dbQuery(sql, (err, result) => {
       if (err) {
         console.error("Error creating user:", err);
         return res.status(500).send("Error in Creating User");
