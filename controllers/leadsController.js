@@ -509,11 +509,11 @@ const searchLeads = asyncHandler(async (req, res) => {
         statusMap[status.id] = status.displayName;
       });
       try {
-        const approvedLeadIds = await fetchDistinctApprovedLeadIds();
-        const fipLeadsIds = await fetchFIPProcessDistinctLeadIds();
-        const bankRejectedLeadsIds = await fetchDistinctBankRejectedLeadIds();
-        const disbursalIds = await fetchDistinctDisbursedLeadIds();
-        const cniIds = await fetchDistinctCNIRejectedLeadIds();
+        const approvedLeadIds = await fetchDistinctApprovedLeadIds(req);
+        const fipLeadsIds = await fetchFIPProcessDistinctLeadIds(req);
+        const bankRejectedLeadsIds = await fetchDistinctBankRejectedLeadIds(req);
+        const disbursalIds = await fetchDistinctDisbursedLeadIds(req);
+        const cniIds = await fetchDistinctCNIRejectedLeadIds(req);
         const processedLeads = leadsResult.map(lead => {
           let leadStatusName;
           if (lead.leadInternalStatus == 12) {
@@ -551,7 +551,7 @@ const searchLeads = asyncHandler(async (req, res) => {
 });
 
 
-async function fetchTeamData() {
+async function fetchTeamData(req) {
   const sql = `
     SELECT *
     FROM users;
@@ -569,7 +569,7 @@ async function fetchTeamData() {
 
 const getSourceName = async (userId) => {
   try {
-    const teamData = await fetchTeamData();
+    const teamData = await fetchTeamData(req);
     const teamMember = teamData.find((member) => member.id == userId);
     console.log(teamMember)
     return teamMember ? teamMember.name : "";
@@ -859,11 +859,11 @@ const getAllLeadData = asyncHandler(async (req, res) => {
     const leadData = leadResults[0]; // Lead details
 
     // Fetch distinct lead IDs for status determination
-    const approvedLeadIds = await fetchDistinctApprovedLeadIds();
-    const fipLeadsIds = await fetchFIPProcessDistinctLeadIds();
-    const bankRejectedLeadsIds = await fetchDistinctBankRejectedLeadIds();
-    const disbursalIds = await fetchDistinctDisbursedLeadIds();
-    const cniIds = await fetchDistinctCNIRejectedLeadIds();
+    const approvedLeadIds = await fetchDistinctApprovedLeadIds(req);
+    const fipLeadsIds = await fetchFIPProcessDistinctLeadIds(req);
+    const bankRejectedLeadsIds = await fetchDistinctBankRejectedLeadIds(req);
+    const disbursalIds = await fetchDistinctDisbursedLeadIds(req);
+    const cniIds = await fetchDistinctCNIRejectedLeadIds(req);
 
     // Function to get status name based on internal status
     const getLeadStatusName = (lead) => {

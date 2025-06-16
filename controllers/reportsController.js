@@ -221,7 +221,7 @@ const exportCallbacks = asyncHandler(async (req, res) => {
 });
 const exportFilesInProcess = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
-    const distinctLeadIds = await fetchFIPProcessDistinctLeadIds();
+    const distinctLeadIds = await fetchFIPProcessDistinctLeadIds(req);
     if (distinctLeadIds.length === 0) {
         return res.status(200).json([]);
     }
@@ -311,7 +311,7 @@ const exportFilesInProcess = asyncHandler(async (req, res) => {
 });
 const exportApprovalLeads = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
-    const distinctLeadIds = await fetchDistinctApprovedLeadIds();
+    const distinctLeadIds = await fetchDistinctApprovedLeadIds(req);
     if (distinctLeadIds.length === 0) {
         return res.status(200).json([]);
     }
@@ -401,7 +401,7 @@ const exportApprovalLeads = asyncHandler(async (req, res) => {
 
 const exportDisbursalLeads = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
-    const distinctLeadIds = await fetchDistinctDisbursedLeadIds();
+    const distinctLeadIds = await fetchDistinctDisbursedLeadIds(req);
     if (distinctLeadIds.length === 0) {
         return res.status(200).json([]);
     }
@@ -491,7 +491,7 @@ const exportDisbursalLeads = asyncHandler(async (req, res) => {
 
 const exportBankRejectedLeads = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
-    const distinctLeadIds = await fetchDistinctBankRejectedLeadIds();
+    const distinctLeadIds = await fetchDistinctBankRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
         return res.status(200).json([]);
     }
@@ -580,7 +580,7 @@ const exportBankRejectedLeads = asyncHandler(async (req, res) => {
 });
 const exportCNILeads = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
-    const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds();
+    const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
         return res.status(200).json([]);
     }
@@ -967,7 +967,7 @@ const exportloginsDoneDetails = asyncHandler(async (req, res) => {
 
 const exportCNILeadDetails = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
-    const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds();
+    const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
         return res.status(200).json([]);
     }

@@ -185,7 +185,7 @@ const getUsers = asyncHandler(async (req, res) => {
     res.status(200).send(leadUsersData);
   });
 });
-function fetchUsers() {
+function fetchUsers(req) {
   return new Promise((resolve, reject) => {
     req.dbQuery("SELECT * FROM users", (err, results) => {
       if (err) {
@@ -198,7 +198,7 @@ function fetchUsers() {
 }
 const getSourceName = async (userId) => {
   try {
-    const leadUsers = await fetchUsers();
+    const leadUsers = await fetchUsers(req);
     const leadUser = leadUsers.find((user) => user.id == userId);
     return leadUser ? leadUser.name : "";
   } catch (error) {
