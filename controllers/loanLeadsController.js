@@ -267,7 +267,7 @@ const createLoanLeadFromCallback = asyncHandler(async (req, res) => {
         if (result.length > 0) {
             const lead = result[0];
             try {
-                const sourcedByName = await getSourceName(lead.sourcedBy);
+                const sourcedByName = await getSourceName(req, lead.sourcedBy);
                 return res.status(400).send(
                     `Lead already exists with phone number ${phoneNumber}, 
          Lead ID - ${lead.id}, Business Name - ${lead.businessName}, 

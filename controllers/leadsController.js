@@ -567,7 +567,7 @@ async function fetchTeamData(req) {
   });
 }
 
-const getSourceName = async (userId) => {
+const getSourceName = async (req, userId) => {
   try {
     const teamData = await fetchTeamData(req);
     const teamMember = teamData.find((member) => member.id == userId);
@@ -593,7 +593,7 @@ const createLead = asyncHandler(async (req, res) => {
     if (result.length > 0) {
       const lead = result[0];
       try {
-        const sourcedByName = await getSourceName(lead.sourcedBy);
+        const sourcedByName = await getSourceName(req, lead.sourcedBy);
         return res.status(400).send(
           `Lead already exists with phone number ${phoneNumber}, 
           Lead ID - ${lead.id}, Business Name - ${lead.businessName}, 
@@ -643,7 +643,7 @@ const createLeadFromCallback = asyncHandler(async (req, res) => {
     if (result.length > 0) {
       const lead = result[0];
       try {
-        const sourcedByName = await getSourceName(lead.sourcedBy);
+        const sourcedByName = await getSourceName(req,lead.sourcedBy);
         return res.status(400).send(
           `Lead already exists with phone number ${phoneNumber}, 
          Lead ID - ${lead.id}, Business Name - ${lead.businessName}, 
@@ -713,7 +713,7 @@ const updateLead = asyncHandler(async (req, res) => {
     if (result.length > 0) {
       const lead = result[0];
       try {
-        const sourcedByName = await getSourceName(lead.sourcedBy);
+        const sourcedByName = await getSourceName(req, lead.sourcedBy);
         return res.status(400).send(
           `Lead already exists with phone number ${primaryPhone}, 
          Lead ID - ${lead.id}, Business Name - ${lead.businessName}, 

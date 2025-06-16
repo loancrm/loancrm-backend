@@ -63,7 +63,7 @@ const createCallBack = asyncHandler(async (req, res) => {
       if (result.length > 0) {
         const callback = result[0];
         try {
-          const sourcedByName = await getSourceName(callback.sourcedBy);
+          const sourcedByName = await getSourceName(req, callback.sourcedBy);
           return res.status(400).send(
             `Callback already exists with phone number ${phoneNumber}, 
            Callback ID - ${callback.callBackId}, Business Name - ${callback.businessName}, 
@@ -110,7 +110,7 @@ const updateCallBack = asyncHandler(async (req, res) => {
     if (result.length > 0) {
       const callback = result[0];
       try {
-        const sourcedByName = await getSourceName(callback.sourcedBy);
+        const sourcedByName = await getSourceName(req, callback.sourcedBy);
         return res.status(400).send(
           `Callback already exists with phone number ${phone}, 
          Callback ID - ${callback.callBackId}, Business Name - ${callback.businessName}, 

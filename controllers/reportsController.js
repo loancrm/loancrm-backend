@@ -66,7 +66,7 @@ const exportLeads = asyncHandler(async (req, res) => {
         try {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
-                result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
+                result[i].sourcedBy = await getSourceName(req, result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
                 result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
@@ -89,7 +89,9 @@ const exportLeads = asyncHandler(async (req, res) => {
             });
             const type = 'LEADS';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -153,7 +155,7 @@ const exportCallbacks = asyncHandler(async (req, res) => {
         try {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
-                result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
+                result[i].sourcedBy = await getSourceName(req, result[i].sourcedBy);
                 result[i].createdOn = moment(new Date(result[i].createdOn)).format('YYYY-MM-DD');
                 result[i].lastUpdatedOn = moment(new Date(result[i].lastUpdatedOn)).format('YYYY-MM-DD');
                 result[i].date = moment(new Date(result[i].date)).format('YYYY-MM-DD');
@@ -177,7 +179,9 @@ const exportCallbacks = asyncHandler(async (req, res) => {
             });
             const type = 'CALLBACKS';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -244,7 +248,7 @@ const exportFilesInProcess = asyncHandler(async (req, res) => {
         try {
             console.log("result", result);
             for (let i = 0; i < result.length; i++) {
-                result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
+                result[i].sourcedBy = await getSourceName(req, result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
                 result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
@@ -267,7 +271,9 @@ const exportFilesInProcess = asyncHandler(async (req, res) => {
             });
             const type = 'FILESINPROCESS';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -333,7 +339,7 @@ const exportApprovalLeads = asyncHandler(async (req, res) => {
         }
         try {
             for (let i = 0; i < result.length; i++) {
-                result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
+                result[i].sourcedBy = await getSourceName(req, result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
                 result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
@@ -356,7 +362,9 @@ const exportApprovalLeads = asyncHandler(async (req, res) => {
             });
             const type = 'SANCTIONFILES';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -423,7 +431,7 @@ const exportDisbursalLeads = asyncHandler(async (req, res) => {
         }
         try {
             for (let i = 0; i < result.length; i++) {
-                result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
+                result[i].sourcedBy = await getSourceName(req, result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
@@ -445,7 +453,9 @@ const exportDisbursalLeads = asyncHandler(async (req, res) => {
             });
             const type = 'DISBURSALFILES';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -513,7 +523,7 @@ const exportBankRejectedLeads = asyncHandler(async (req, res) => {
         }
         try {
             for (let i = 0; i < result.length; i++) {
-                result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
+                result[i].sourcedBy = await getSourceName(req, result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
                 result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
@@ -536,7 +546,9 @@ const exportBankRejectedLeads = asyncHandler(async (req, res) => {
             });
             const type = 'BANKREJECTEDFILES';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -603,7 +615,7 @@ const exportCNILeads = asyncHandler(async (req, res) => {
         try {
             console.log(result);
             for (let i = 0; i < result.length; i++) {
-                result[i].sourcedBy = await getSourceName(result[i].sourcedBy);
+                result[i].sourcedBy = await getSourceName(req, result[i].sourcedBy);
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
@@ -625,7 +637,9 @@ const exportCNILeads = asyncHandler(async (req, res) => {
             });
             const type = 'CNIFILES';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -717,7 +731,9 @@ const exportSanctionDetails = asyncHandler(async (req, res) => {
             });
             const type = 'SANCTIONDETAILS';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -794,17 +810,17 @@ const exportDisbursalDetails = asyncHandler(async (req, res) => {
             for (let i = 0; i < result.length; i++) {
                 let leadId = result[i].leadId;
                 let contactSql = `SELECT primaryPhone FROM leads WHERE id = ?`;
-    
+
                 const contactResult = await new Promise((resolve, reject) => {
                     req.dbQuery(contactSql, [leadId], (contactErr, contactRes) => {
                         if (contactErr) reject(contactErr);
                         else resolve(contactRes);
                     });
                 });
-    
+
                 // Assign contact number to the result object
                 result[i].primaryPhone = contactResult.length > 0 ? contactResult[0].primaryPhone : 'N/A';
-    
+
                 // Format date if needed
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
             }
@@ -827,7 +843,9 @@ const exportDisbursalDetails = asyncHandler(async (req, res) => {
             });
             const type = 'DISBURSALDETAILS';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -922,7 +940,9 @@ const exportloginsDoneDetails = asyncHandler(async (req, res) => {
             });
             const type = 'LOGINSDONEDETAILS';
             const leadId = 'REPORTS';
-            const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+            const accountId = req.user.accountId;
+            const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+            // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
             const response = await axios.post(url, formData, {
                 headers: {
                     ...formData.getHeaders(),
@@ -1013,7 +1033,7 @@ const exportCNILeadDetails = asyncHandler(async (req, res) => {
                     };
                 });
                 for (let i = 0; i < mergedResults.length; i++) {
-                    mergedResults[i].sourcedBy = await getSourceName(mergedResults[i].sourcedBy);
+                    mergedResults[i].sourcedBy = await getSourceName(req, mergedResults[i].sourcedBy);
                     mergedResults[i].createdOn = moment(mergedResults[i].createdOn).format('YYYY-MM-DD');
                     // mergedResults[i].approvedStatus = mergedResults[i].approvedStatus.toUpperCase();
                     // mergedResults[i].fipStatus = mergedResults[i].fipStatus.toUpperCase();
@@ -1039,7 +1059,9 @@ const exportCNILeadDetails = asyncHandler(async (req, res) => {
                 });
                 const type = 'CNIDETAILS';
                 const leadId = 'REPORTS';
-                const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+                const accountId = req.user.accountId;
+                const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
+                // const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
                 const response = await axios.post(url, formData, {
                     headers: formData.getHeaders(),
                 });
@@ -1176,7 +1198,7 @@ const exportloginFiles = asyncHandler(async (req, res) => {
             for (let i = 0; i < result.length; i++) {
                 const login = result[i];
                 const sourcedById = sourcedByMap[login.leadId];
-                login.sourcedBy = await getSourceName(sourcedById); // Add sourcedBy name
+                login.sourcedBy = await getSourceName(req, sourcedById); // Add sourcedBy name
             }
             try {
                 console.log(result)
@@ -1226,9 +1248,11 @@ const exportloginFiles = asyncHandler(async (req, res) => {
                     filename: excelFileName,
                     contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 });
+
                 const type = 'LOGINFILES';
                 const leadId = 'REPORTS';
-                const url = `https://files.thefintalk.in/files?type=${type}&leadId=${leadId}`;
+                const accountId = req.user.accountId;
+                const url = `https://files.loancrm.org/files?type=${type}&leadId=${leadId}&accountId=${accountId}`;
                 const response = await axios.post(url, formData, {
                     headers: {
                         ...formData.getHeaders(),

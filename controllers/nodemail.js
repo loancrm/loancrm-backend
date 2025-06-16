@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-async function getActiveSourcedByIds() {
+async function getActiveSourcedByIds(req) {
     const sql = `SELECT id FROM users WHERE userType = 3 AND status = "Active"`;
     return new Promise((resolve, reject) => {
         req.dbQuery(sql, (err, result) => {
@@ -50,10 +50,10 @@ async function getJoiningDate(userId) {
     }
 }
 
-async function getLeadsAndCallbacksCountForActiveSources() {
+async function getLeadsAndCallbacksCountForActiveSources(req) {
     try {
         // Step 1: Get the active sourcedBy IDs from sources table
-        const activeSourcedByIds = await getActiveSourcedByIds();
+        const activeSourcedByIds = await getActiveSourcedByIds(req);
         if (activeSourcedByIds.length === 0) {
             console.log("No active sourcedBy IDs found.");
             return;
@@ -247,7 +247,7 @@ async function sendLeadsReport() {
             return;
         }
         const countsHTML = await Promise.all(counts.map(async (item, index) => {
-            const SourcedByName = await getSourceName(item.sourcedBy)
+            const SourcedByName = await getSourceName(req, item.sourcedBy)
             const joiningDate = await getJoiningDate(item.sourcedBy)
             return `
                 <tr>
