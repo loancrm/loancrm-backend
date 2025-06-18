@@ -10,7 +10,7 @@ const userLogin = asyncHandler(async (req, res) => {
   }
   //const sql = `SELECT * FROM users WHERE email = "${username}" OR name = "${username}"`;
   // const sql = `SELECT * FROM users WHERE (email = "${username}" OR name = "${username}") AND status = "Active"`;
-  const sql = `SELECT * FROM users WHERE email = "${username}" AND status = "Active"`;
+  const sql = `SELECT * FROM users WHERE (email = "${username}" OR phone = "${username}") AND status = "Active"`;
   console.log(sql)
   console.log(req.body)
   dbConnect.query(sql, async (err, result) => {

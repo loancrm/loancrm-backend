@@ -227,7 +227,8 @@ const exportFilesInProcess = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     const distinctLeadIds = await fetchFIPProcessDistinctLeadIds(req);
     if (distinctLeadIds.length === 0) {
-        return res.status(200).json([]);
+        // return res.status(200).json([]);
+        return res.status(404).send('No Files in Process Found');
     }
     const inClause = distinctLeadIds.map((id) => `${id}`).join(",");
     let sql = `SELECT * FROM leads`;
@@ -319,7 +320,8 @@ const exportApprovalLeads = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     const distinctLeadIds = await fetchDistinctApprovedLeadIds(req);
     if (distinctLeadIds.length === 0) {
-        return res.status(200).json([]);
+        // return res.status(200).json([]);
+        return res.status(404).send('No Sanctions Found');
     }
     const inClause = distinctLeadIds.map((id) => `${id}`).join(",");
     let sql = `SELECT * FROM leads`;
@@ -411,7 +413,8 @@ const exportDisbursalLeads = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     const distinctLeadIds = await fetchDistinctDisbursedLeadIds(req);
     if (distinctLeadIds.length === 0) {
-        return res.status(200).json([]);
+        // return res.status(200).json([]);
+        return res.status(404).send('No Disbursals Found');
     }
     const inClause = distinctLeadIds.map((id) => `${id}`).join(",");
     let sql = `SELECT * FROM leads`;
@@ -503,7 +506,8 @@ const exportBankRejectedLeads = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     const distinctLeadIds = await fetchDistinctBankRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
-        return res.status(200).json([]);
+        // return res.status(200).json([]);
+        return res.status(404).send('No Bank Rejected Files Found');
     }
     const inClause = distinctLeadIds.map((id) => `${id}`).join(",");
     let sql = `SELECT * FROM leads`;
@@ -594,7 +598,8 @@ const exportCNILeads = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
-        return res.status(200).json([]);
+        // return res.status(200).json([]);
+        return res.status(404).send("No CNI Files Found");
     }
     const inClause = distinctLeadIds.map((id) => `${id}`).join(",");
     let sql = `SELECT * FROM leads`;
@@ -989,7 +994,8 @@ const exportCNILeadDetails = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     const distinctLeadIds = await fetchDistinctCNIRejectedLeadIds(req);
     if (distinctLeadIds.length === 0) {
-        return res.status(200).json([]);
+        // return res.status(200).json([]);
+        return res.status(404).send('No CNI Details found');
     }
     const inClause = distinctLeadIds.map((id) => `${id}`).join(",");
     let sqlLogins = `SELECT * FROM logins WHERE (leadId IN (${inClause})) AND (fipStatus = 'approved' AND approvedStatus IN ('cnis', 'hold')) OR fipStatus ='hold'`;

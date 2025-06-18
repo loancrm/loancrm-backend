@@ -36,6 +36,7 @@ app.use("/reports", authMiddleware, accountIdMiddleware, applyIpWhitelist, requi
 app.use("/bankers", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/bankersRoutes"));
 app.use("/createTable", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/createTableRoutes"));
 app.use("/ipAddress", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/ipAddressRoutes.js"));
+app.use("/subscriptions", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/subscriptionRoutes.js"));
 app.use("/accounts", require("./routes/accountRoutes.js"));
 app.use("/uploads", authMiddleware, express.static(path.join(__dirname, "uploads")));
 
