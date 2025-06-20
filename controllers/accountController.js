@@ -12,42 +12,95 @@ const {
 
 let leadUsersData = [];
 
+// const createAccount = asyncHandler(async (req, res) => {
+//     try {
+//         const { password, emailId, mobile } = req.body;
+//         // const encryptedPassword = await bcrypt.hash(password, 12);
+
+//         const accountId = generateRandomNumber(6);
+//         req.body["accountId"] = accountId;
+//         req.body["status"] = 1;
+//         req.body["lastStatus"] = 1;
+//         req.body["createdBy"] = req.body.name;
+//         req.body["updatedBy"] = req.body.name;
+//         // req.body["password"] = encryptedPassword;
+
+//         const checkIfExistsQuery = `SELECT * FROM accounts WHERE emailId = ? OR mobile = ?`;
+//         dbConnect.query(checkIfExistsQuery, [emailId, mobile], (err, results) => {
+//             if (err) {
+//                 console.error("Error checking if user exists:", err);
+//                 return res.status(500).send("Error in checking user");
+//             }
+
+//             if (results.length > 0) {
+//                 return res.status(400).send("User with this email or phone number already exists");
+//             }
+
+//             const createClause = createClauseHandler(req.body);
+//             const sql = `INSERT INTO accounts (${createClause[0]}) VALUES (${createClause[1]})`;
+
+//             dbConnect.query(sql, async (err) => {
+//                 if (err) {
+//                     console.error("Error creating user:", err);
+//                     return res.status(500).send("Error in creating user");
+//                 }
+
+//                 // ➕ Call insertUser after successful account creation
+//                 try {
+//                     await insertUser(req.body);
+//                     return res.status(200).send(true);
+//                 } catch (userErr) {
+//                     console.error("Error creating linked user:", userErr);
+//                     return res.status(500).send("Account created, but user creation failed");
+//                 }
+//             });
+//         });
+//     } catch (error) {
+//         console.error("Unexpected error in createAccount:", error);
+//         return res.status(500).send("Internal server error");
+//     }
+// });
+
+
 const createAccount = asyncHandler(async (req, res) => {
     try {
-        const { password, emailId, mobile } = req.body;
-        // const encryptedPassword = await bcrypt.hash(password, 12);
-
-        const accountId = generateRandomNumber(6);
-        req.body["accountId"] = accountId;
-        req.body["status"] = 1;
-        req.body["lastStatus"] = 1;
-        req.body["createdBy"] = req.body.name;
-        req.body["updatedBy"] = req.body.name;
-        // req.body["password"] = encryptedPassword;
-
-        const checkIfExistsQuery = `SELECT * FROM accounts WHERE emailId = ? OR mobile = ?`;
-        dbConnect.query(checkIfExistsQuery, [emailId, mobile], (err, results) => {
+        const { password, emailId, mobile, name } = req.body;
+        // Step 1: Check both accounts and users tables
+        const checkIfExistsQuery = `
+            SELECT 'account' AS source FROM accounts WHERE emailId = ? OR mobile = ?
+            UNION
+            SELECT 'user' AS source FROM users WHERE email = ? OR phone = ?
+        `;
+        dbConnect.query(checkIfExistsQuery, [emailId, mobile, emailId, mobile], (err, results) => {
             if (err) {
-                console.error("Error checking if user exists:", err);
-                return res.status(500).send("Error in checking user");
+                console.error("Error checking if user/account exists:", err);
+                return res.status(500).send("Error checking existing records");
             }
 
             if (results.length > 0) {
                 return res.status(400).send("User with this email or phone number already exists");
             }
 
+            // Step 2: Proceed to create account only if no match found
+            const accountId = generateRandomNumber(6);
+            req.body["accountId"] = accountId;
+            req.body["status"] = 1;
+            req.body["lastStatus"] = 1;
+            req.body["createdBy"] = name;
+            req.body["updatedBy"] = name;
+
             const createClause = createClauseHandler(req.body);
             const sql = `INSERT INTO accounts (${createClause[0]}) VALUES (${createClause[1]})`;
 
             dbConnect.query(sql, async (err) => {
                 if (err) {
-                    console.error("Error creating user:", err);
-                    return res.status(500).send("Error in creating user");
+                    console.error("Error creating account:", err);
+                    return res.status(500).send("Error creating account");
                 }
 
-                // ➕ Call insertUser after successful account creation
+                // Step 3: Create user linked to this account
                 try {
-                    await insertUser(req.body);
+                    await insertUser(req.body); // Note: insertUser returns a promise
                     return res.status(200).send(true);
                 } catch (userErr) {
                     console.error("Error creating linked user:", userErr);
@@ -88,7 +141,9 @@ const insertUser = async (accountData) => {
                 if (err) return reject("Error checking if user exists");
 
                 if (results.length > 0) {
-                    return res.status(400).send("User with this email or phone number already exists");
+                    if (results.length > 0) {
+                        return reject("User with this email or phone number already exists");
+                    }
                 }
                 const createClause = createClauseHandler(userData);
                 const insertQuery = `INSERT INTO users (${createClause[0]}) VALUES (${createClause[1]})`;

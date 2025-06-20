@@ -120,7 +120,7 @@ const getDistinctLeadCount = asyncHandler(async (req, res) => {
     const distinctLeadIds = await fetchDistinctLeadIds(req);
     if (distinctLeadIds.length === 0) {
       // return res.status(200).json({ count: 0 });
-        return res.status(200).send("0");
+      return res.status(200).send("0");
     }
     const inClause = distinctLeadIds.map(id => `${id}`).join(",");
     let countSql = `SELECT COUNT(*) AS count FROM leads`;
@@ -771,7 +771,7 @@ const getCNIRejectsDetailsById = asyncHandler((req, res) => {
 });
 
 const getLoginsDoneById = asyncHandler((req, res) => {
-  let sql = `SELECT businessName, program, bankName, fipStatus, fipRemarks FROM logins`;
+  let sql = `SELECT * FROM logins`;
   const queryParams = req.query;
   const filtersQuery = handleGlobalFilters(queryParams);
   sql += filtersQuery;
