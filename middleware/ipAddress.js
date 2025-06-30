@@ -5,9 +5,28 @@ function isUserLoggedIn(req) {
     return req.body.username == null;
 }
 let allowedIPs = [];
+// function fetchAllowedIPs(req) {
+//     return new Promise((resolve, reject) => {
+//         // console.log(req.user)
+//         req.dbQuery("SELECT ipAddress FROM ipaddresses", (err, results) => {
+//             if (err) {
+//                 return reject(err);
+//             }
+//             const prefixes = results.map((row) =>
+//                 row.ipAddress.split(".").slice(0, 2).join(".")
+//             );
+//             resolve(prefixes);
+//         });
+//     });
+// }
 function fetchAllowedIPs(req) {
     return new Promise((resolve, reject) => {
-        req.dbQuery("SELECT ipAddress FROM ipaddresses", (err, results) => {
+        const accountId = req.user?.accountId;
+        if (!accountId) {
+            return reject(new Error("accountId not found in request"));
+        }
+        const sql = "SELECT ipAddress FROM ipaddresses WHERE accountId = ?";
+        dbConnect.query(sql, [accountId], (err, results) => {
             if (err) {
                 return reject(err);
             }

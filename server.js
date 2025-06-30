@@ -11,6 +11,8 @@ const accountIdMiddleware = require("./middleware/accountIdMiddleware");
 
 const { scheduleCronJobs } = require('./controllers/nodemail.js');
 const authMiddleware = require("./middleware/verifySuperAdmin.js");
+const checkSubscriptionValidity = require("./middleware/checkSubscriptionValidity.js");
+const startSubscriptionExpiryJob = require("./controllers/subscriptionExpiryJob.js");
 app.use(
   cors({
     origin: "*",
@@ -25,22 +27,23 @@ const options = {
 
 
 app.use("/user", require("./routes/userRoutes"));
-app.use("/leads", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/leadsRoutes"));
-app.use("/loanleads", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/loanLeadsRoutes.js"));
-app.use("/callbacks", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/callbackRoutes"));
-app.use("/files", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/fileHandlerRoutes"));
-app.use("/counts", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/allCountRoutes"));
-app.use("/users", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/teamRoutes"));
-app.use("/logins", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/loginsRoutes"));
-app.use("/reports", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/reportsRoutes"));
-app.use("/bankers", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/bankersRoutes"));
-app.use("/createTable", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/createTableRoutes"));
-app.use("/ipAddress", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/ipAddressRoutes.js"));
-app.use("/subscriptions", authMiddleware, accountIdMiddleware, applyIpWhitelist, require("./routes/subscriptionRoutes.js"));
+app.use("/leads", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/leadsRoutes"));
+app.use("/loanleads", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/loanLeadsRoutes.js"));
+app.use("/callbacks", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/callbackRoutes"));
+app.use("/files", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/fileHandlerRoutes"));
+app.use("/counts", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/allCountRoutes"));
+app.use("/users", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/teamRoutes"));
+app.use("/logins", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/loginsRoutes"));
+app.use("/reports", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/reportsRoutes"));
+app.use("/bankers", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/bankersRoutes"));
+app.use("/createTable", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/createTableRoutes"));
+app.use("/ipAddress", authMiddleware, accountIdMiddleware, applyIpWhitelist, checkSubscriptionValidity, require("./routes/ipAddressRoutes.js"));
+app.use("/subscriptions", authMiddleware, applyIpWhitelist, require("./routes/subscriptionRoutes.js"));
 app.use("/accounts", require("./routes/accountRoutes.js"));
 app.use("/uploads", authMiddleware, express.static(path.join(__dirname, "uploads")));
 
 scheduleCronJobs();
+startSubscriptionExpiryJob()
 // console.log(process.env.PORT)
 // app.listen(process.env.PORT, () => {
 //   console.log("Server Running Peacefully");
