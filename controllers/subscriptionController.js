@@ -76,7 +76,7 @@ const verifyAndStoreSubscription = asyncHandler(async (req, res) => {
             plan_type,
             price,
             durationDays,
-            auto_renew = 0,
+            auto_renew ,
             razorpay_payment_id,
             razorpay_order_id,
             razorpay_signature
@@ -150,7 +150,7 @@ const createSubscription = asyncHandler(async (req, res) => {
             plan_type,
             price,
             durationDays,
-            auto_renew = false
+            auto_renew 
         } = req.body;
 
         // ❌ If plan is Free Trial, check if one already exists
