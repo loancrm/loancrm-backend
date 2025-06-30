@@ -59,9 +59,7 @@ async function calculateSubscriptionDates(accountId, durationDays) {
     } else {
         start_date = today.clone();
     }
-
     const end_date = start_date.clone().add(durationDays, 'days');
-
     return {
         formattedStart: start_date.format('YYYY-MM-DD'),
         formattedEnd: end_date.format('YYYY-MM-DD'),
@@ -78,7 +76,7 @@ const verifyAndStoreSubscription = asyncHandler(async (req, res) => {
             plan_type,
             price,
             durationDays,
-            auto_renew = true,
+            auto_renew = 0,
             razorpay_payment_id,
             razorpay_order_id,
             razorpay_signature
@@ -91,7 +89,7 @@ const verifyAndStoreSubscription = asyncHandler(async (req, res) => {
             .digest("hex");
 
         if (generatedSignature !== razorpay_signature) {
-            return res.status(400).json({ message: "Invalid Razorpay signature" });
+            return res.status(400).send("Invalid Razorpay signature");
         }
 
         // 📅 Compute Dates
@@ -127,7 +125,6 @@ const verifyAndStoreSubscription = asyncHandler(async (req, res) => {
             amount_paid: price,
             currency: "INR",
             status: "Success",
-            created_on: new Date()
         };
 
         const [txnCols, txnVals] = createClauseHandler(txnPayload);
