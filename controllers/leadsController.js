@@ -344,8 +344,11 @@ const getDscrValuesById = asyncHandler((req, res) => {
 const calculateGstProgram = asyncHandler((req, res) => {
   const { totalEmi, odCcInterestAy1, gstTurnover, margin, months } = req.body;
   const margin1 = margin / 100;
-  const monthlyInterest = (gstTurnover * margin1) / months;
-  const monthlyPayment = monthlyInterest * 0.8;
+  const interest = months / 100;
+  // const monthlyInterest = (gstTurnover * margin1) / months;
+  // const monthlyPayment = monthlyInterest * 0.8;
+  const monthlyInterest = (gstTurnover * margin1) / 12;
+  const monthlyPayment = monthlyInterest * interest;
   const finalMonthlyPayment = monthlyPayment - totalEmi - odCcInterestAy1;
   const gstValue = Math.round(finalMonthlyPayment);
   req.body["lastUpdatedBy"] = req.user.name;
@@ -420,15 +423,16 @@ const calculateDscrRatio = asyncHandler((req, res) => {
     proposedEmi,
     odCcInterestAy1,
     monthsAy1,
+    interestonLoansAy1
   } = req.body;
   let numerator = 0;
   if (directorsRemuAy1) {
-    numerator = profitaftertaxAy1 + depreciationAy1 + directorsRemuAy1;
+    numerator = profitaftertaxAy1 + depreciationAy1 + directorsRemuAy1 + interestonLoansAy1;
   } else if (partnerRemuAy1 && partnerInterestAy1) {
     numerator =
-      profitaftertaxAy1 + depreciationAy1 + partnerRemuAy1 + partnerInterestAy1;
+      profitaftertaxAy1 + depreciationAy1 + partnerRemuAy1 + partnerInterestAy1 + interestonLoansAy1;
   } else {
-    numerator = profitaftertaxAy1 + depreciationAy1;
+    numerator = profitaftertaxAy1 + depreciationAy1 + interestonLoansAy1;
   }
   const denominator = (totalEmi + proposedEmi + odCcInterestAy1) * monthsAy1;
   const resultFirstYear =
@@ -457,8 +461,11 @@ const calculateBTOProgram = asyncHandler((req, res) => {
   const { totalEmi, odCcInterestAy1, bankingTurnover, btoMargin, btoMonths } =
     req.body;
   const margin1 = btoMargin / 100;
-  const monthlyInterest = (bankingTurnover * margin1) / btoMonths;
-  const monthlyPayment = monthlyInterest * 0.8; // 80% of monthly interest
+  const interest = btoMonths / 100;
+  // const monthlyInterest = (bankingTurnover * margin1) / btoMonths;
+  // const monthlyPayment = monthlyInterest * 0.8; // 80% of monthly interest
+  const monthlyInterest = (bankingTurnover * margin1) / 12;
+  const monthlyPayment = monthlyInterest * interest; // 80% of monthly interest
   const finalMonthlyPayment = monthlyPayment - totalEmi - odCcInterestAy1;
   const btoValue = Math.round(finalMonthlyPayment);
   req.body["lastUpdatedBy"] = req.user.name;
@@ -610,9 +617,11 @@ const createLead = asyncHandler(async (req, res) => {
 
 function createNewLead(req, res) {
   let leadId = "L-" + generateRandomNumber(6);
+  // let customId = "BL-" + generateRandomNumber(6);
   let id = generateRandomNumber(9);
   req.body["id"] = id;
   req.body["leadId"] = leadId;
+  // req.body["customId"] = customId;
   req.body["leadInternalStatus"] = 1;
   req.body["lastLeadInternalStatus"] = 1;
   req.body["createdBy"] = req.user.name;
@@ -660,9 +669,11 @@ const createLeadFromCallback = asyncHandler(async (req, res) => {
 
 function createNewLeadFromCallback(req, res) {
   let leadId = "L-" + generateRandomNumber(6);
+  // let customId = "BL-" + generateRandomNumber(6);
   let id = generateRandomNumber(9);
   req.body["id"] = id;
   req.body["leadId"] = leadId;
+  // req.body["customId"] = customId;
   req.body["leadInternalStatus"] = 1;
   req.body["lastLeadInternalStatus"] = 1;
   req.body["createdBy"] = req.user.name;
