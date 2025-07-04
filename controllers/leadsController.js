@@ -385,10 +385,18 @@ const calculateBalanceSheet = asyncHandler((req, res) => {
   const creditNumerator = sundryCreditorsAy1 * 365;
   const debtDenominator = turnoverAy1;
   const creditDenominator = purchasesAy1;
+  // const debtor_daysFirstYear =
+  //   debtDenominator !== 0 ? debtNumerator / debtDenominator : 0;
+  // const creditor_daysFirstYear =
+  //   creditDenominator !== 0 ? creditNumerator / creditDenominator : 0;
   const debtor_daysFirstYear =
-    debtDenominator !== 0 ? debtNumerator / debtDenominator : 0;
+    debtDenominator !== 0
+      ? Math.round((debtNumerator / debtDenominator) * 100) / 100
+      : 0;
   const creditor_daysFirstYear =
-    creditDenominator !== 0 ? creditNumerator / creditDenominator : 0;
+    creditDenominator !== 0
+      ? Math.round((creditNumerator / creditDenominator) * 100) / 100
+      : 0;
   req.body["lastUpdatedBy"] = req.user.name;
   const updateClause = updateClauseHandler(req.body);
   if (!updateClause) {
@@ -617,11 +625,11 @@ const createLead = asyncHandler(async (req, res) => {
 
 function createNewLead(req, res) {
   let leadId = "L-" + generateRandomNumber(6);
-  // let customId = "BL-" + generateRandomNumber(6);
+  let customId = "BL-" + generateRandomNumber(5);
   let id = generateRandomNumber(9);
   req.body["id"] = id;
   req.body["leadId"] = leadId;
-  // req.body["customId"] = customId;
+  req.body["customId"] = customId;
   req.body["leadInternalStatus"] = 1;
   req.body["lastLeadInternalStatus"] = 1;
   req.body["createdBy"] = req.user.name;
@@ -669,11 +677,11 @@ const createLeadFromCallback = asyncHandler(async (req, res) => {
 
 function createNewLeadFromCallback(req, res) {
   let leadId = "L-" + generateRandomNumber(6);
-  // let customId = "BL-" + generateRandomNumber(6);
+  let customId = "BL-" + generateRandomNumber(5);
   let id = generateRandomNumber(9);
   req.body["id"] = id;
   req.body["leadId"] = leadId;
-  // req.body["customId"] = customId;
+  req.body["customId"] = customId;
   req.body["leadInternalStatus"] = 1;
   req.body["lastLeadInternalStatus"] = 1;
   req.body["createdBy"] = req.user.name;

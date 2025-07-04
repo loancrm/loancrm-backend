@@ -130,8 +130,27 @@ const createLoanLead = asyncHandler((req, res) => {
                         `Lead already exists with phone number ${phoneNumber}, created by ${lead.sourcedByName}, Lead ID - ${lead.leadId}`
                     );
             } else {
+                let loanTypePrefix; // Default prefix
+                const loanType = req.body.loanType;
+
+                switch (loanType) {
+                    case 'personalLoan':
+                        loanTypePrefix = 'PL-';
+                        break;
+                    case 'homeLoan':
+                        loanTypePrefix = 'HL-';
+                        break;
+                    case 'lap':
+                        loanTypePrefix = 'LAP-';
+                        break;
+                    // add more cases if needed
+                    default:
+                        loanTypePrefix = 'L-'; // fallback
+                }
+                let customId = loanTypePrefix + generateRandomNumber(5);
                 let leadId = generateRandomNumber(5);
                 req.body["leadId"] = leadId;
+                req.body["customId"] = customId;
                 req.body["leadInternalStatus"] = 1;
                 req.body["lastLeadInternalStatus"] = 1;
                 req.body["createdBy"] = req.user.name;
@@ -284,7 +303,27 @@ const createLoanLeadFromCallback = asyncHandler(async (req, res) => {
 
 function createNewLoanLeadFromCallback(req, res) {
     let leadId = generateRandomNumber(5);
+    let loanTypePrefix; // Default prefix
+    const loanType = req.body.loanType;
+
+    switch (loanType) {
+        case 'personalLoan':
+            loanTypePrefix = 'PL-';
+            break;
+        case 'homeLoan':
+            loanTypePrefix = 'HL-';
+            break;
+        case 'lap':
+            loanTypePrefix = 'LAP-';
+            break;
+        // add more cases if needed
+        default:
+            loanTypePrefix = 'L-'; // fallback
+    }
+
+    let customId = loanTypePrefix + generateRandomNumber(5);
     req.body["leadId"] = leadId;
+    req.body["customId"] = customId;
     req.body["leadInternalStatus"] = 1;
     req.body["lastLeadInternalStatus"] = 1;
     req.body["createdBy"] = req.user.name;
